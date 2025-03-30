@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <float.h>
 #include <math.h>
+#include <time.h>
 
 #include "kain.h"
 #include "BO2BigFile.h"
@@ -12,6 +15,8 @@
 #include "directory.h"
 #include "patcher.h"
 #include "modvalues.h"
+
+//#define DATA_DUMP_MESSAGES
 
 void my_exit();
 
@@ -25,6 +30,11 @@ int get_kain_level_hp_offset(int level)
 }
 
 int main(int argc, char *argv[]) {
+
+    printf("::::::::::::::::::::::::::::::::::::::::\n");
+    printf(": Blood Omen 2 Patcher v0.2            :\n");
+    printf(":                          suloku 2025 :\n");
+    printf("::::::::::::::::::::::::::::::::::::::::\n\n");
 
 //First get the path the file is run from
     if (argc > 0) {
@@ -249,11 +259,12 @@ int main(int argc, char *argv[]) {
                 //Check for Red lore chests
                 if (strcmp(current->data.fileName, "coll_lore")==0)
                 {
+                    printf("\t\tcoll_lore.tunedata\n");
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_RedChest_Lore, sizeof(new_RedChest_Lore)) == 0) {
-                        printf("\t\tRed Chest lore successfully replaced at offset 0x%lX\n", replace_offset);
+                        printf("\t\t\tRed Chest lore successfully replaced at offset 0x%lX\n", replace_offset);
                     } else {
-                        printf("\t\tFailed to replace Red Chest lore.\n");
+                        printf("\t\t\tFailed to replace Red Chest lore.\n");
                     }
                     current = current->next;
                     continue;
@@ -261,11 +272,12 @@ int main(int argc, char *argv[]) {
                 //Blue lore chests
                 else if (strcmp(current->data.fileName, "coll_biglore")==0)
                 {
+                    printf("\t\tcoll_biglore.tunedata\n");
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_BlueChest_Lore, sizeof(new_BlueChest_Lore)) == 0) {
-                        printf("\t\tBlue Chest lore successfully replaced at offset 0x%lX\n", replace_offset);
+                        printf("\t\t\tBlue Chest lore successfully replaced at offset 0x%lX\n", replace_offset);
                     } else {
-                        printf("\t\tFailed to replace Blue Chest lore.\n");
+                        printf("\t\t\tFailed to replace Blue Chest lore.\n");
                     }
                     current = current->next;
                     continue;
@@ -277,21 +289,82 @@ int main(int argc, char *argv[]) {
                     //If we find an npc file, make the modifications and skip to next file
                     if (strcmp(current->data.fileName, npcFilesToModNames[x])==0)
                     {
-                        replace_offset = current->data.fileOffset+npc_lore_offset;
-                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_lore, sizeof(new_npc_lore)) == 0) {
-                            printf("\t\t%s.tunedata's lore successfully replaced at offset 0x%lX\n", current->data.fileName, replace_offset);
-                        } else {
-                            printf("\t\tFailed to replace %s.tunedata's lore.\n", current->data.fileName);
-                        }
-                        replace_offset = current->data.fileOffset+npc_crawl_away_data_hitpoints_offset;
+                        printf("\t\t%s.tunedata\n", npcFilesToModNames[x]);
+
                         float test = 0;
-                        read_4_bytes_from_file(filename, replace_offset, &test);
-                        printf("\t\t%s.tunedata's crawl hitpoints: %f\n", current->data.fileName, test);
-                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_crawl_hitpoints, sizeof(new_npc_crawl_hitpoints)) == 0) {
-                            printf("\t\t%s.tunedata's crawl hitpoints successfully replaced at offset 0x%lX\n", current->data.fileName, replace_offset);
-                        } else {
-                            printf("\t\tFailed to replace %s.tunedata's lore.\n", current->data.fileName);
+                        float npc_hitpoints = 0;
+                    //Get NPCs hitpoints
+                        replace_offset = current->data.fileOffset+npc_HitPoints_offset;
+                        test = 0;
+                        read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&npc_hitpoints);
+                        //Print this NPCs HP
+#ifdef DATA_DUMP_MESSAGES
+                        printf("\t\t\t%s.tunedata's HP: %f\n", current->data.fileName, npc_hitpoints);
+#endif
+                    //Replace Max Blood
+                        replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_normalMaxBlood_offset;
+                        float MaxBlood = 0;
+                        read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&MaxBlood);
+                        //Print this NPCs Max Blood
+#ifdef DATA_DUMP_MESSAGES
+                        printf("\t\t\t%s.tunedata's Max Blood: %f\n", current->data.fileName, MaxBlood);
+                        //Replace code
+#endif
+                    //Replace Max Stealth Blood
+                        replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_stealthKillMaxBlood_offset;
+                        test = 0;
+                        read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&test);
+                        //Print this NPCs Max Stealth Blood
+#ifdef DATA_DUMP_MESSAGES
+                        printf("\t\t\t%s.tunedata's Max Stealh Blood: %f\n", current->data.fileName, test);
+#endif
+                    //Replace Bloodsuck Rate
+                        replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_healthSuckSpeed_offset;
+                        float new_bloodsuck_rate = 25; //Default is 25 HP per second
+                        if (MaxBlood < 51) {
+                            new_bloodsuck_rate = MaxBlood/npc_bloodsukratio_0_50;
+                        } else if (MaxBlood > 50 && MaxBlood < 76) {
+                            new_bloodsuck_rate = MaxBlood/npc_bloodsukratio_51_75;
+                        } else if (MaxBlood > 75 && MaxBlood < 126) {
+                            new_bloodsuck_rate = MaxBlood/npc_bloodsukratio_76_125;
+                        } else { //MaxBlood > 125
+                            new_bloodsuck_rate = MaxBlood/npc_bloodsukratio_126plus;
                         }
+                        test = 0;
+                        read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&test);
+                        //Print this NPCs Bloodsuck rate
+#ifdef DATA_DUMP_MESSAGES
+                        printf("\t\t\t%s.tunedata's Bloodsuck rate: %f hp per second\n", current->data.fileName, test);
+#endif
+                        //Replace code
+                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_bloodsuck_rate, sizeof(new_bloodsuck_rate)) == 0) {
+                            printf("\t\t\t%s.tunedata's Bloodsuck rate successfully replaced at offset 0x%lX\n", current->data.fileName, replace_offset);
+                        } else {
+                            printf("\t\t\tFailed to replace %s.tunedata's Bloodsuck rate.\n", current->data.fileName);
+                        }
+
+                    //Replace Lore
+                        replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_maxLore_offset;
+                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_lore, sizeof(new_npc_lore)) == 0) {
+                            printf("\t\t\t%s.tunedata's lore successfully replaced at offset 0x%lX\n", current->data.fileName, replace_offset);
+                        } else {
+                            printf("\t\t\tFailed to replace %s.tunedata's lore.\n", current->data.fileName);
+                        }
+
+                    //Replace Crawl Hitpoints
+                        replace_offset = current->data.fileOffset+npc_crawl_away_data_hitpoints_offset;
+                        test = 0;
+                        read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&test);
+                        //Print this NPCs crawl hitpoints
+#ifdef DATA_DUMP_MESSAGES
+                        printf("\t\t\t%s.tunedata's crawl hitpoints: %f\n", current->data.fileName, test);
+#endif
+                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_crawl_hitpoints, sizeof(new_npc_crawl_hitpoints)) == 0) {
+                            printf("\t\t\t%s.tunedata's crawl hitpoints successfully replaced at offset 0x%lX\n", current->data.fileName, replace_offset);
+                        } else {
+                            printf("\t\t\tFailed to replace %s.tunedata's lore.\n", current->data.fileName);
+                        }
+
                         break;
                     }
                 }

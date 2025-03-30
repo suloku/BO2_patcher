@@ -2,11 +2,18 @@
 
 //Bosses and Greater demons don't reward lore
 
-int32_t npc_hitpoints_offset = 0x04;
-int32_t npc_lore_offset = 0x448;
-int32_t npc_deathtunedata_offset = 0x0428; //4*4 bytes long
+int32_t npc_DeathTunedata_offset = 0x0428; //4*4 bytes long
 int32_t npc_crawl_away_data_offset = 0x300; // 4*3 bytes long (3 floats)
+
 int32_t npc_crawl_away_data_hitpoints_offset = 0x308;
+
+int32_t npc_HitPoints_offset = 0x04;
+int32_t npc_BloodSuckTunedata_offset = 0x438;
+int32_t npc_BloodSuckTunedata_healthSuckSpeed_offset = 0x43c;
+int32_t npc_BloodSuckTunedata_normalMaxBlood_offset = 0x440;
+int32_t npc_BloodSuckTunedata_stealthKillMaxBlood_offset = 0x444;
+int32_t npc_BloodSuckTunedata_maxLore_offset = 0x448;
+
 
 const char *npcFilesToModNames[] = {
     "arisanm",  //Aristocrat

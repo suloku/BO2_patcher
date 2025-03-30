@@ -13,6 +13,11 @@ float new_weapon_Lore = 0;
 float new_npc_lore = 0;
 float new_npc_crawl_hitpoints = 5;
 
+float npc_bloodsukratio_0_50 = 1.0;
+float npc_bloodsukratio_51_75 = 1.25;
+float npc_bloodsukratio_76_125 = 1.5;
+float npc_bloodsukratio_126plus = 1.75;
+
 //kainX.tunedata
 float wipe_chance = 5;
 float lorePerParticle = 25; //Blue and Red chests Lore must be divisible by this number
