@@ -1,0 +1,58 @@
+# depslib dependency file v1.0
+1743232830 source:c:\users\suloku\source\repos\bo2_patcher\main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<float.h>
+	<math.h>
+	"kain.h"
+	"BO2BigFile.h"
+	"Collectables.h"
+	"Enemies.h"
+	"levels.h"
+	"directory.h"
+	"patcher.h"
+	"modvalues.h"
+
+1742848727 source:c:\users\suloku\source\repos\bo2_patcher\directory.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/stat.h>
+	"directory.h"
+
+1743230853 c:\users\suloku\source\repos\bo2_patcher\kain.h
+
+1742848735 c:\users\suloku\source\repos\bo2_patcher\directory.h
+
+1743200036 c:\users\suloku\source\repos\bo2_patcher\patcher.h
+
+1742720707 source:c:\users\suloku\source\repos\bo2_patcher\patcher.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"patcher.h"
+
+1743229685 c:\users\suloku\source\repos\bo2_patcher\collectables.h
+
+1743228082 c:\users\suloku\source\repos\bo2_patcher\enemies.h
+	<stdint.h>
+
+1743233020 c:\users\suloku\source\repos\bo2_patcher\levels.h
+
+1743235303 source:c:\users\suloku\source\repos\bo2_patcher\bo2bigfile.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdint.h>
+	"directory.h"
+	"BO2BigFile.h"
+
+1743106916 c:\users\suloku\source\repos\bo2_patcher\bo2bigfile.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stdint.h>
+
+1743230877 c:\users\suloku\source\repos\bo2_patcher\modvalues.h
+
