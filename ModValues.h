@@ -3,9 +3,9 @@ The different collectables in the game share the same structure.
 The three of them can theorically reward lore and hp (even weapons, untested)
 */
 //coll_lore.tunedata
-float new_RedChest_Lore = 75;
+float new_RedChest_Lore = 60;
 //coll_biglore.tunedata
-float new_BlueChest_Lore = 125;
+float new_BlueChest_Lore = 100;
 //coll_weapon.tuneda
 float new_weapon_Lore = 0;
 
@@ -20,9 +20,12 @@ float npc_bloodsukratio_126plus = 1.75;
 
 //kainX.tunedata
 float wipe_chance = 5;
-float lorePerParticle = 25; //Blue and Red chests Lore must be divisible by this number
+float lorePerParticle = 20; //Blue and Red chests Lore must be divisible by this number
+int32_t kain_get_up_presses = 1;
+float VampireWeaponMultiplier = 2;
 
 //Kain Levels
+int32_t kain_MaxLoreLevels = 16;
 float kainlevel_hp_values[] = {
     30,  // Level 0
     60,  // Level 1
@@ -78,8 +81,7 @@ float kainlevel_lore_values[] = {
     880, // Level 13
     930, // Level 14
     950, // Level 15
-    //950, // Level 16
-    FLT_MAX, // Level 16
+    950, // Level 16
     950, // Level 17
     950, // Level 18
     950, // Level 19

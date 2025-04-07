@@ -8,6 +8,8 @@ files.
 
 */
 
+#define KAIN_TOTAL_LEVELS 26
+
 const char *kain_big_files[] = {
     "kain.big",
     "kainb.big", //Conceptual Edition
@@ -27,10 +29,13 @@ struct kainlevel {
 };
 
 int wipe_chance_offset = 0x500;
+int KainHitReactControls_offset = 0x8e8;
+int time_on_ground_offset = 0x99c;
+int vampireWeaponDamageMultiplier_offset = 0x38;
 
 float max_lore_level = FLT_MAX;
 int kain_levels_offset = 0x22a8;
-int lorelevel_19_lore_offset = 0x2340;
+int numLoreLevels_offset = 0x08b8;
 
 
 int lorePerParticle_offset = 0x514;

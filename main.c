@@ -6,6 +6,7 @@
 #include <float.h>
 #include <math.h>
 #include <time.h>
+#include <float.h>
 
 #include "kain.h"
 #include "BO2BigFile.h"
@@ -76,7 +77,6 @@ int main(int argc, char *argv[]) {
         my_exit();
     }
 
-    long current_offset;
     long replace_offset;
 
     //Kain Bigfiles
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
                 replace_offset = current->data.fileOffset+wipe_chance_offset;
                 if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&wipe_chance, sizeof(wipe_chance)) == 0)
                 {
-                    printf("\t\tWipe Chance successfully replaced at offset 0x%lX\n", replace_offset);
+                    printf("\t\tWipe Chance successfully replaced at offset 0x%lX to %f\n", replace_offset, wipe_chance);
                 } else
                 {
                     printf("\t\tFailed to replace wipe chance.\n");
@@ -135,28 +135,67 @@ int main(int argc, char *argv[]) {
                 //Change Lore Per Particle
                 replace_offset = current->data.fileOffset+lorePerParticle_offset;
                 if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&lorePerParticle, sizeof(lorePerParticle)) == 0) {
-                    printf("\t\tLore particles successfully replaced at offset 0x%lX\n", replace_offset);
+                    printf("\t\tLore particles successfully replaced at offset 0x%lX to %f\n", replace_offset, lorePerParticle);
                 } else {
                     printf("\t\tFailed to replace Lore particles.\n");
                 }
 
+                //Change number of button presses for Kain to get up after knockdown
+                replace_offset = current->data.fileOffset+KainHitReactControls_offset;
+                if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&kain_get_up_presses, sizeof(kain_get_up_presses)) == 0) {
+                    printf("\t\tKnockdown button presses successfully replaced at offset 0x%lX to %d\n", replace_offset, kain_get_up_presses);
+                } else {
+                    printf("\t\tFailed to replace knockdown button presses.\n");
+                }
+
+                //Change Vampire Weapon Damage Multiplier
+                replace_offset = current->data.fileOffset+vampireWeaponDamageMultiplier_offset;
+                if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&VampireWeaponMultiplier, sizeof(VampireWeaponMultiplier)) == 0) {
+                    printf("\t\tVampire Weapon Damage Multiplier successfully replaced at offset 0x%lX to %f\n", replace_offset, VampireWeaponMultiplier);
+                } else {
+                    printf("\t\tFailed to replace Vampire Weapon Damage Multiplier.\n");
+                }
+
+                //Change Max Lore Levels
+                replace_offset = current->data.fileOffset+numLoreLevels_offset;
+                if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&kain_MaxLoreLevels, sizeof(kain_MaxLoreLevels)) == 0) {
+                    printf("\t\tMax Lore Levels successfully replaced at offset 0x%lX to %d\n", replace_offset, kain_MaxLoreLevels);
+                } else {
+                    printf("\t\tFailed to replace Max Lore Levels.\n");
+                }
+
                 //Change Kain's level data
-                //Patch max lore level for level 16 to prevent overflow bug
-                int levelToChange = 16;
-                replace_offset = current->data.fileOffset+get_kain_level_lore_offset(levelToChange);
-                if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&kainlevel_lore_values[levelToChange], sizeof(kainlevel_lore_values[levelToChange])) == 0) {
-                    printf("\t\tLevel %d's Lore successfully replaced at offset 0x%lX\n", levelToChange, replace_offset);
-                } else {
-                    printf("\t\tFailed to replace Level %d's Lore.\n", levelToChange);
+                //Patch Lore
+                for (j=0;j<KAIN_TOTAL_LEVELS;j++)
+                {
+                    int levelToChange = j;
+                    float temp = 0;
+                    replace_offset = current->data.fileOffset+get_kain_level_lore_offset(levelToChange);
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (temp != kainlevel_lore_values[levelToChange])
+                    {
+                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&kainlevel_lore_values[levelToChange], sizeof(kainlevel_lore_values[levelToChange])) == 0) {
+                            if (kainlevel_lore_values[levelToChange] == FLT_MAX)
+                                printf("\t\tLevel %d's Lore successfully replaced at offset 0x%lX to FLT_MAX\n", levelToChange, replace_offset);
+                            else
+                                printf("\t\tLevel %d's Lore successfully replaced at offset 0x%lX to %f\n", levelToChange, replace_offset, kainlevel_lore_values[levelToChange]);
+                        } else {
+                            printf("\t\tFailed to replace Level %d's Lore.\n", levelToChange);
+                        }
+                    }
+                    //Patch HP
+                    replace_offset = current->data.fileOffset+get_kain_level_hp_offset(levelToChange);
+                    read_4_bytes_from_file(filename, replace_offset, ( unsigned char *)&temp);
+                    if (temp != kainlevel_hp_values[levelToChange])
+                    {
+                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&kainlevel_hp_values[levelToChange], sizeof(kainlevel_hp_values[levelToChange])) == 0) {
+                            printf("\t\tLevel %d's HP successfully replaced at offset 0x%lX to %f\n", levelToChange, replace_offset, kainlevel_hp_values[levelToChange]);
+                        } else {
+                            printf("\t\tFailed to replace Level %d's Lore.\n", levelToChange);
+                        }
+                    }
                 }
-                //Patch level 16's HP to be 500 instead of 485
-                levelToChange = 16;
-                replace_offset = current->data.fileOffset+get_kain_level_hp_offset(levelToChange);
-                if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&kainlevel_hp_values[levelToChange], sizeof(kainlevel_hp_values[levelToChange])) == 0) {
-                    printf("\t\tLevel %d's HP successfully replaced at offset 0x%lX\n", levelToChange, replace_offset);
-                } else {
-                    printf("\t\tFailed to replace Level %d's Lore.\n", levelToChange);
-                }
+                //Since we found the kain.tunedata file and modified it, we are done
                 break;
             }
 
@@ -262,7 +301,7 @@ int main(int argc, char *argv[]) {
                     printf("\t\tcoll_lore.tunedata\n");
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_RedChest_Lore, sizeof(new_RedChest_Lore)) == 0) {
-                        printf("\t\t\tRed Chest lore successfully replaced at offset 0x%lX\n", replace_offset);
+                        printf("\t\t\tRed Chest lore successfully replaced at offset 0x%lX to %f\n", replace_offset, new_RedChest_Lore);
                     } else {
                         printf("\t\t\tFailed to replace Red Chest lore.\n");
                     }
@@ -275,7 +314,7 @@ int main(int argc, char *argv[]) {
                     printf("\t\tcoll_biglore.tunedata\n");
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_BlueChest_Lore, sizeof(new_BlueChest_Lore)) == 0) {
-                        printf("\t\t\tBlue Chest lore successfully replaced at offset 0x%lX\n", replace_offset);
+                        printf("\t\t\tBlue Chest lore successfully replaced at offset 0x%lX to %f\n", replace_offset, new_BlueChest_Lore);
                     } else {
                         printf("\t\t\tFailed to replace Blue Chest lore.\n");
                     }
@@ -338,7 +377,7 @@ int main(int argc, char *argv[]) {
 #endif
                         //Replace code
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_bloodsuck_rate, sizeof(new_bloodsuck_rate)) == 0) {
-                            printf("\t\t\t%s.tunedata's Bloodsuck rate successfully replaced at offset 0x%lX\n", current->data.fileName, replace_offset);
+                            printf("\t\t\t%s.tunedata's Bloodsuck rate successfully replaced at offset 0x%lX to %f\n", current->data.fileName, replace_offset, new_bloodsuck_rate);
                         } else {
                             printf("\t\t\tFailed to replace %s.tunedata's Bloodsuck rate.\n", current->data.fileName);
                         }
@@ -346,7 +385,7 @@ int main(int argc, char *argv[]) {
                     //Replace Lore
                         replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_maxLore_offset;
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_lore, sizeof(new_npc_lore)) == 0) {
-                            printf("\t\t\t%s.tunedata's lore successfully replaced at offset 0x%lX\n", current->data.fileName, replace_offset);
+                            printf("\t\t\t%s.tunedata's lore successfully replaced at offset 0x%lX to %f\n", current->data.fileName, replace_offset, new_npc_lore);
                         } else {
                             printf("\t\t\tFailed to replace %s.tunedata's lore.\n", current->data.fileName);
                         }
@@ -360,7 +399,7 @@ int main(int argc, char *argv[]) {
                         printf("\t\t\t%s.tunedata's crawl hitpoints: %f\n", current->data.fileName, test);
 #endif
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_crawl_hitpoints, sizeof(new_npc_crawl_hitpoints)) == 0) {
-                            printf("\t\t\t%s.tunedata's crawl hitpoints successfully replaced at offset 0x%lX\n", current->data.fileName, replace_offset);
+                            printf("\t\t\t%s.tunedata's crawl hitpoints successfully replaced at offset 0x%lX to %f\n", current->data.fileName, replace_offset, new_npc_crawl_hitpoints);
                         } else {
                             printf("\t\t\tFailed to replace %s.tunedata's lore.\n", current->data.fileName);
                         }
