@@ -67,6 +67,15 @@ int main(int argc, char *argv[]) {
     parse_ini(filename, &config);
     //print_config(&config);
 
+    KAIN_tunedata tempKAINconfig;
+    init_NPC_config(&tempKAINconfig);
+
+    if (get_config_KAIN(&config, &tempKAINconfig, "default"))
+    {
+        printf("found");
+        printf("\t%s Presses:%d Multi:%f Level 5 HP:%f ReaverDamage:%f\n", tempKAINconfig.kainFile, tempKAINconfig.get_up_presses, tempKAINconfig.vampireWeaponMultiplier, tempKAINconfig.levels[5].hp, tempKAINconfig.weapons[KAINWEAPON_SOULREAVER].lastberserk_damage);
+    }
+
     NPC_tunedata tempNPCconfig;
     init_NPC_config(&tempNPCconfig);
 

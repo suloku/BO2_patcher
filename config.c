@@ -485,6 +485,441 @@ bool get_config_CHEST(Config* config, CHEST_tunedata* CHEST, const char* chestNa
     return found;
 }
 
+// Function to initialize KAIN data.
+// -1/NULL is used to identify a missing config, thus use the default config
+// If the default config is being used, -1/NULL is used to not make any changes to the files
+void init_KAIN_config(KAIN_tunedata* KAIN)
+{
+    KAIN->kainFile[0] = '\0';
+    KAIN->wipe_chance = -1;
+    KAIN->lorePerParticle;
+    KAIN->get_up_presses; // Stored as float per requirement
+    KAIN->vampireWeaponMultiplier;
+    KAIN->maxLoreLevels; // Stored as float per requirement
+    for (int i = 0; i < KAIN_MAX_LEVELS; i++)
+    {
+        KAIN->levels[i].hp = -1;
+        KAIN->levels[i].lore = -1;
+    }
+    for (int i = 0; i < KAIN_MAX_WEAPONS; i++)
+    {
+        KAIN->weapons[i].name[0] = '\0';
+        KAIN->weapons[i].first_attack_damage = -1;
+        KAIN->weapons[i].second_attack_damage = -1;
+        KAIN->weapons[i].third_attack_damage = -1;
+        KAIN->weapons[i].ground_damage = -1;
+        KAIN->weapons[i].grab_loop_damage = -1;
+        KAIN->weapons[i].grab_final_damage = -1;
+        KAIN->weapons[i].fury_damage = -1;
+        KAIN->weapons[i].jump_damage = -1; // Only used by hands
+        KAIN->weapons[i].berserk_damage = -1;
+        KAIN->weapons[i].lastberserk_damage = -1;
+        KAIN->weapons[i].grab_throw_damage = -1; // Only used by hands
+    }
+    KainWeaponData weapons[KAIN_MAX_WEAPONS];
+}
+
+bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) {
+    bool found = false;
+    bool found_default = false;
+
+    //Initialize with values we can detect
+    init_KAIN_config(&defaultKAIN);
+
+    for (int i = 0; i < config->section_count; i++)
+    {
+        const Section* section = &config->sections[i];
+        //printf("Section: [%s]\n", section->name);
+        if (strcmp(section->name, "KAIN") == 0)
+        {
+            init_KAIN_config(KAIN); //Reset before reading in new values
+            for (int j = 0; j < section->key_count; j++)
+            {
+                const KeyValue* kv = &section->keys[j];
+                trim_leading_spaces(kv->value);
+
+                if (strcmp(kv->key, "kainFile") == 0)
+                {
+                    strcpy(KAIN->kainFile, kv->value);
+                }
+                else if (strcmp(kv->key, "wipe_chance") == 0)
+                {
+                    KAIN->wipe_chance = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "lorePerParticle") == 0)
+                {
+                    KAIN->lorePerParticle = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "get_up_presses") == 0)
+                {
+                    KAIN->get_up_presses = atoi(kv->value);
+                }
+                else if (strcmp(kv->key, "VampireWeaponMultiplier") == 0)
+                {
+                    KAIN->vampireWeaponMultiplier = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "MaxLorelevels") == 0)
+                {
+                    KAIN->maxLoreLevels = atoi(kv->value);
+                }
+                else if (strncmp(kv->key, "level_", 6) == 0)
+                {
+                    int level;
+                    char type[5];
+                    if (sscanf(kv->key + 6, "%02d_%4s", &level, type) == 2 && level >= 0 && level < KAIN_MAX_LEVELS)
+                    {
+                        if (strcmp(type, "LORE") == 0) {
+                            KAIN->levels[level].lore = atof(kv->value);
+                        } else if (strcmp(type, "HP") == 0) {
+                            KAIN->levels[level].hp = atof(kv->value);
+                        }
+                    }
+                }
+                else if (strncmp(kv->key, "hands_", 6) == 0)
+                {
+                    char attack[20];
+                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    {
+                        int cur_weapon = KAINWEAPON_HANDS;
+                        if (strcmp(attack, "1stattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "2ndattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "3rdattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].third_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "ground_damage") == 0) {
+                            KAIN->weapons[cur_weapon].ground_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_loop_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_loop_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_final_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_final_damage = atof(kv->value);
+                        } else if (strcmp(attack, "fury_damage") == 0) {
+                            KAIN->weapons[cur_weapon].fury_damage = atof(kv->value);
+                        } else if (strcmp(attack, "berserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "lastberserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "jump_damage") == 0) {
+                            KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_throw_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_throw_damage = atof(kv->value);
+                        }
+                    }
+                }
+                else if (strncmp(kv->key, "lsword_", 7) == 0)
+                {
+                    char attack[20];
+                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    {
+                        int cur_weapon = KAINWEAPON_LSWORD;
+                        if (strcmp(attack, "1stattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "2ndattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "3rdattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].third_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "ground_damage") == 0) {
+                            KAIN->weapons[cur_weapon].ground_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_loop_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_loop_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_final_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_final_damage = atof(kv->value);
+                        } else if (strcmp(attack, "fury_damage") == 0) {
+                            KAIN->weapons[cur_weapon].fury_damage = atof(kv->value);
+                        } else if (strcmp(attack, "berserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "lastberserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "jump_damage") == 0) {
+                            KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_throw_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_throw_damage = atof(kv->value);
+                        }
+                    }
+                } else if (strncmp(kv->key, "dagger_", 7) == 0)
+                {
+                    char attack[20];
+                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    {
+                        int cur_weapon = KAINWEAPON_DAGGER;
+                        if (strcmp(attack, "1stattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "2ndattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "3rdattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].third_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "ground_damage") == 0) {
+                            KAIN->weapons[cur_weapon].ground_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_loop_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_loop_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_final_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_final_damage = atof(kv->value);
+                        } else if (strcmp(attack, "fury_damage") == 0) {
+                            KAIN->weapons[cur_weapon].fury_damage = atof(kv->value);
+                        } else if (strcmp(attack, "berserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "lastberserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "jump_damage") == 0) {
+                            KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_throw_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_throw_damage = atof(kv->value);
+                        }
+                    }
+                } else if (strncmp(kv->key, "handax_", 7) == 0)
+                {
+                    char attack[20];
+                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    {
+                        int cur_weapon = KAINWEAPON_HANDAX;
+                        if (strcmp(attack, "1stattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "2ndattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "3rdattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].third_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "ground_damage") == 0) {
+                            KAIN->weapons[cur_weapon].ground_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_loop_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_loop_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_final_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_final_damage = atof(kv->value);
+                        } else if (strcmp(attack, "fury_damage") == 0) {
+                            KAIN->weapons[cur_weapon].fury_damage = atof(kv->value);
+                        } else if (strcmp(attack, "berserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "lastberserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "jump_damage") == 0) {
+                            KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_throw_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_throw_damage = atof(kv->value);
+                        }
+                    }
+                } else if (strncmp(kv->key, "crossbow_", 9) == 0)
+                {
+                    char attack[20];
+                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    {
+                        int cur_weapon = KAINWEAPON_CROSSBOW;
+                        if (strcmp(attack, "1stattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "2ndattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "3rdattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].third_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "ground_damage") == 0) {
+                            KAIN->weapons[cur_weapon].ground_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_loop_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_loop_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_final_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_final_damage = atof(kv->value);
+                        } else if (strcmp(attack, "fury_damage") == 0) {
+                            KAIN->weapons[cur_weapon].fury_damage = atof(kv->value);
+                        } else if (strcmp(attack, "berserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "lastberserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "jump_damage") == 0) {
+                            KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_throw_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_throw_damage = atof(kv->value);
+                        }
+                    }
+                } else if (strncmp(kv->key, "polearm_", 8) == 0)
+                {
+                    char attack[20];
+                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    {
+                        int cur_weapon = KAINWEAPON_POLEARM;
+                        if (strcmp(attack, "1stattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "2ndattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "3rdattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].third_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "ground_damage") == 0) {
+                            KAIN->weapons[cur_weapon].ground_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_loop_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_loop_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_final_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_final_damage = atof(kv->value);
+                        } else if (strcmp(attack, "fury_damage") == 0) {
+                            KAIN->weapons[cur_weapon].fury_damage = atof(kv->value);
+                        } else if (strcmp(attack, "berserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "lastberserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "jump_damage") == 0) {
+                            KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_throw_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_throw_damage = atof(kv->value);
+                        }
+                    }
+                } else if (strncmp(kv->key, "hsword_", 7) == 0)
+                {
+                    char attack[20];
+                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    {
+                        int cur_weapon = KAINWEAPON_HSWORD;
+                        if (strcmp(attack, "1stattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "2ndattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "3rdattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].third_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "ground_damage") == 0) {
+                            KAIN->weapons[cur_weapon].ground_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_loop_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_loop_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_final_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_final_damage = atof(kv->value);
+                        } else if (strcmp(attack, "fury_damage") == 0) {
+                            KAIN->weapons[cur_weapon].fury_damage = atof(kv->value);
+                        } else if (strcmp(attack, "berserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "lastberserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "jump_damage") == 0) {
+                            KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_throw_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_throw_damage = atof(kv->value);
+                        }
+                    }
+                } else if (strncmp(kv->key, "club_", 5) == 0)
+                {
+                    char attack[20];
+                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    {
+                        int cur_weapon = KAINWEAPON_CLUB;
+                        if (strcmp(attack, "1stattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "2ndattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "3rdattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].third_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "ground_damage") == 0) {
+                            KAIN->weapons[cur_weapon].ground_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_loop_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_loop_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_final_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_final_damage = atof(kv->value);
+                        } else if (strcmp(attack, "fury_damage") == 0) {
+                            KAIN->weapons[cur_weapon].fury_damage = atof(kv->value);
+                        } else if (strcmp(attack, "berserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "lastberserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "jump_damage") == 0) {
+                            KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_throw_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_throw_damage = atof(kv->value);
+                        }
+                    }
+                } else if (strncmp(kv->key, "mace_", 5) == 0)
+                {
+                    char attack[20];
+                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    {
+                        int cur_weapon = KAINWEAPON_MACE;
+                        if (strcmp(attack, "1stattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "2ndattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "3rdattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].third_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "ground_damage") == 0) {
+                            KAIN->weapons[cur_weapon].ground_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_loop_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_loop_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_final_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_final_damage = atof(kv->value);
+                        } else if (strcmp(attack, "fury_damage") == 0) {
+                            KAIN->weapons[cur_weapon].fury_damage = atof(kv->value);
+                        } else if (strcmp(attack, "berserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "lastberserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "jump_damage") == 0) {
+                            KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_throw_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_throw_damage = atof(kv->value);
+                        }
+                    }
+                } else if (strncmp(kv->key, "soulreaver_", 11) == 0)
+                {
+                    printf("\nSoulReaver\n");
+                    char attack[20];
+                    if (sscanf(kv->key + 11, "%s", attack) == 1 )
+                    {
+                        printf("\t%s\n", attack);
+                        int cur_weapon = KAINWEAPON_SOULREAVER;
+                        if (strcmp(attack, "1stattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "2ndattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "3rdattack_damage") == 0) {
+                            KAIN->weapons[cur_weapon].third_attack_damage = atof(kv->value);
+                        } else if (strcmp(attack, "ground_damage") == 0) {
+                            KAIN->weapons[cur_weapon].ground_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_loop_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_loop_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_final_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_final_damage = atof(kv->value);
+                        } else if (strcmp(attack, "fury_damage") == 0) {
+                            KAIN->weapons[cur_weapon].fury_damage = atof(kv->value);
+                        } else if (strcmp(attack, "berserk_damage") == 0) {
+                            KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
+                        } else if (strcmp(attack, "lastberserk_damage") == 0) {
+                            printf("\ndamageberserk %d, %d\n", KAINWEAPON_SOULREAVER, KAINWEAPON_HANDS);
+                            KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
+                            printf("\ndamageberserk %f\n", KAIN->weapons[cur_weapon].lastberserk_damage);
+                        } else if (strcmp(attack, "jump_damage") == 0) {
+                            KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
+                        } else if (strcmp(attack, "grab_throw_damage") == 0) {
+                            KAIN->weapons[cur_weapon].grab_throw_damage = atof(kv->value);
+                        }
+                    }
+                }
+                else //Unrecognized key
+                {
+                    printf("\n\tUnrecognized key in config file:\n\t\t[%s] %s = %s\n\n", section->name, kv->key, kv->value);
+                    printf("Can't proceed. Correct the configuration file and try again.");
+                    exit(0);
+                }
+            }//For loop end
+
+            //Check if this file is set as default, and copy it
+            if (contains_word_exact(KAIN->kainFile, "default"))
+            {
+                printf("\nFound default\n");
+                defaultKAIN = *KAIN;
+                found_default = true;
+            }
+            else if (contains_word_exact(KAIN->kainFile, kainFile))
+            {
+                //We found the CHEST for this level, break
+                printf("\nFound kainFile config\n");
+                found = true;
+                break;
+            }
+
+
+        }//Section check end
+
+        if (found) break;
+
+    }//Section loop end
+
+    //If we didn't find the specified KAIN, but there was a default setting
+    if (!found && found_default)
+    {
+        *KAIN = defaultKAIN;
+        found = true;
+    }
+    return found;
+}
+
 /*
 int main(int argc, char* argv[]) {
     if (argc < 2) {

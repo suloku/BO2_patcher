@@ -30,32 +30,87 @@ typedef struct {
 } Config;
 
 //Config structures
+
+#define KAIN_MAX_LEVELS 26 // From level_00 to level_25
+#define MAX_FILENAME 20 // For weapon names like "soulreaver"
+#define KAIN_MAX_WEAPONS 10 // For weapon names like "soulreaver"
+#define MAX_LEVEL_ARRAY 1024
+
+// Sub-structure for level data (LORE and HP pairs)
 typedef struct {
-    char npcFile[20]; //.tunedata files are quite short (8-16 chars), but better be safe
+    float lore;
+    float hp;
+} KainLevelData;
+
+enum KainWeaponType
+{
+	KAINWEAPON_HANDS,
+	KAINWEAPON_LSWORD,
+	KAINWEAPON_DAGGER,
+	KAINWEAPON_HANDAX,
+	KAINWEAPON_CROSSBOW,
+	KAINWEAPON_POLEARM,
+	KAINWEAPON_HSWORD,
+	KAINWEAPON_CLUB,
+	KAINWEAPON_MACE,
+	KAINWEAPON_SOULREAVER
+};
+
+// Sub-structure for weapon damage data
+typedef struct {
+    char name[MAX_FILENAME]; // e.g., "hands", "lsword"
+    float first_attack_damage; // 1stattack_damage
+    float second_attack_damage; // 2ndattack_damage
+    float third_attack_damage; // 3rdattack_damage
+    float ground_damage;
+    float grab_loop_damage;
+    float grab_final_damage;
+    float fury_damage;
+    float jump_damage; // Only used by hands
+    float berserk_damage;
+    float lastberserk_damage;
+    float grab_throw_damage; // Only used by hands
+} KainWeaponData;
+
+// Main structure for all configuration data
+typedef struct {
+    char kainFile[MAX_FILENAME]; // e.g., "default", "Kain", "Kainb", "Kainc"...
+    float wipe_chance;
+    float lorePerParticle;
+    int32_t get_up_presses; // Stored as float per requirement
+    float vampireWeaponMultiplier;
+    int32_t maxLoreLevels; // Stored as float per requirement
+    KainLevelData levels[KAIN_MAX_LEVELS]; // level_00 to level_25
+    KainWeaponData weapons[KAIN_MAX_WEAPONS]; // hands, lsword, dagger, handax, crossbow, polearm, hsword, club, mace, soulreaver
+} KAIN_tunedata;
+
+typedef struct {
+    char npcFile[MAX_FILENAME]; //.tunedata files are quite short (8-16 chars), but better be safe
     float HitPoints;
     float CrawlHitPoints;
     float healthSuckSpeed;
     float normalMaxBlood;
     float stealtKillMaxBlood;
     float maxLore;
-    char levels[1024];  // Array of strings (level names). 1024 should be enough chars even if all level names are written.
+    char levels[MAX_LEVEL_ARRAY];  // Array of strings (level names). 1024 should be enough chars even if all level names are written.
 } NPC_tunedata;
 
 typedef struct {
-    char weaponFile[20];
+    char weaponFile[MAX_FILENAME];
     float HP;
     int32_t grabLoops;
-    char levels[1024];  // Array of strings (level names). 1024 should be enough chars even if all level names are written.
+    char levels[MAX_LEVEL_ARRAY];  // Array of strings (level names). 1024 should be enough chars even if all level names are written.
 }WEAPON_tunedata;
 
 typedef struct {
-    char chestFile[20];
+    char chestFile[MAX_FILENAME];
     float lore;
-    char levels[1024];  // Array of strings (level names). 1024 should be enough chars even if all level names are written.
+    char levels[MAX_LEVEL_ARRAY];  // Array of strings (level names). 1024 should be enough chars even if all level names are written.
 }CHEST_tunedata;
 
 //Variables
 
+KAIN_tunedata defaultKAIN;
 NPC_tunedata defaultNPC;
 WEAPON_tunedata defaultWEAPON;
 CHEST_tunedata defaultCHEST;
@@ -66,3 +121,4 @@ void parse_ini(const char* filename, Config* config);
 bool get_config_NPC(Config* config, NPC_tunedata* NPC, const char* npcName, const char* levelName);
 bool get_config_WEAPON(Config* config, WEAPON_tunedata* WEAPON, const char* weaponName, const char* levelName);
 bool get_config_CHEST(Config* config, CHEST_tunedata* CHEST, const char* chestName, const char* levelName);
+bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile);
