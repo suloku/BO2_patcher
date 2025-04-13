@@ -14,7 +14,6 @@ int32_t npc_BloodSuckTunedata_normalMaxBlood_offset = 0x440;
 int32_t npc_BloodSuckTunedata_stealthKillMaxBlood_offset = 0x444;
 int32_t npc_BloodSuckTunedata_maxLore_offset = 0x448;
 
-
 const char *npcFilesToModNames[] = {
     "arisanm",  //Aristocrat
     "arisbnm",
@@ -92,7 +91,7 @@ const char *npcFilesToModNames[] = {
 
     "thugawm",  //Thugs
 
-    "umahvf",   //Umah
+    //"umahvf",   //Umah Can't be bloodsucked or interacted with.
     //"umahvf_train_attack",
     //"umahvf_train_block",
     //"umahvf_train_grab",

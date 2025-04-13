@@ -6,7 +6,6 @@
 #include <float.h>
 #include <math.h>
 #include <time.h>
-#include <float.h>
 
 #include "kain.h"
 #include "BO2BigFile.h"
@@ -16,8 +15,14 @@
 #include "directory.h"
 #include "patcher.h"
 #include "modvalues.h"
+#include "weapons.h"
+
+#include "config.h"
 
 //#define DATA_DUMP_MESSAGES
+#define OUTPUT_TUNEDATA_FILES
+
+extern NPC_tunedata defaultNPC;
 
 void my_exit();
 
@@ -54,6 +59,46 @@ int main(int argc, char *argv[]) {
         *(pos) = '\0'; //this will put the null terminator here. you can also copy to another string if you want
     }
     printf ("RunPath: %s\n", runPath);
+
+    append_directory(runPath, "config.ini", filename, sizeof(filename));
+    Config config;
+    init_config(&config);
+
+    parse_ini(filename, &config);
+    //print_config(&config);
+
+    NPC_tunedata tempNPCconfig;
+    init_NPC_config(&tempNPCconfig);
+
+    WEAPON_tunedata tempWEAPONconfig;
+    init_WEAPON_config(&tempWEAPONconfig);
+
+    CHEST_tunedata tempCHESTconfig;
+    init_CHEST_config(&tempCHESTconfig);
+
+    if (get_config_CHEST(&config, &tempCHESTconfig, "col_lore", "levels1"))
+    {
+        printf("found");
+        printf("\t%s %f %s\n", tempCHESTconfig.chestFile, tempCHESTconfig.lore, tempCHESTconfig.levels);
+        printf("\t%s %f %s\n", defaultCHEST.chestFile, defaultCHEST.lore, defaultCHEST.levels);
+    }
+
+    if (get_config_WEAPON(&config, &tempWEAPONconfig, "lsword", "level1"))
+    {
+        printf("found");
+        printf("\t%s %f %d %s\n", tempWEAPONconfig.weaponFile, tempWEAPONconfig.HP, tempWEAPONconfig.grabLoops, tempWEAPONconfig.levels);
+        printf("\t%s %f %d %s\n", defaultWEAPON.weaponFile, defaultWEAPON.HP, defaultWEAPON.grabLoops, defaultWEAPON.levels);
+    }
+
+    if (get_config_NPC(&config, &tempNPCconfig, "VampireHunter", "level1"))
+    {
+        printf("found");
+        printf("\t%s %f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
+    }
+
+    free_config(&config);
+
+    my_exit();
 
     //Check correct path
     append_directory(runPath, "bo2.exe", filename, sizeof(filename));
@@ -264,6 +309,8 @@ int main(int argc, char *argv[]) {
         //these two chained prisoners are mandatory to be sucked to get
         //6 lore and level up to level 1 as part of the tutorial.
         //Since we don't need to change any file inside sl02.big, skip it.
+
+        //TODO add some checks in this file to allow customization.
         if (strcmp(get_filename(filename), "sl02.big")==0)
         {
             printf("\tSkipping file '%s' (no changes needed).\n", get_filename(filename));
@@ -291,6 +338,30 @@ int main(int argc, char *argv[]) {
         }
 
         BigFileEntryNode* current = entryList->head;
+
+#ifdef OUTPUT_TUNEDATA_FILES
+        // Debug code that dumps all *.tundeta file to "tunedatas.txt"
+        FILE *file;
+        // Open the file in append mode ("a"). This will create the file if it doesn't exist.
+        file = fopen("tunedatas.txt", "a");
+        // Check if the file was opened successfully
+        if (file == NULL) {
+            printf("Error opening file!\n");
+            my_exit();
+        }
+        fprintf(file, "%s\n", get_filename(filename));
+        while (current != NULL)
+        {
+            if (strcmp(current->data.fileType, "tunedata")==0)
+            {
+                fprintf(file, "\t%s.tunedata\n", current->data.fileName);
+            }
+            current = current->next;
+        }
+        // Close the file when done
+        fclose(file);
+#endif
+
         while (current != NULL)
         {
             if (strcmp(current->data.fileType, "tunedata")==0)
@@ -404,8 +475,37 @@ int main(int argc, char *argv[]) {
                             printf("\t\t\tFailed to replace %s.tunedata's lore.\n", current->data.fileName);
                         }
 
-                        break;
+                        break;//test next file
                     }
+                }
+
+                //Check for Weapon files inside the bigfile
+                for (x=0;x<dropWeaponFilesToModNamesCount;x++)
+                {
+                    //If we find an npc file, make the modifications and skip to next file
+                    if (strcmp(current->data.fileName, dropWeaponFilesToModNames[x])==0)
+                    {
+                        printf("\t\t%s.tunedata\n", dropWeaponFilesToModNames[x]);
+
+                        //Update weapon parameters
+                        //Change weapon's HP
+                        replace_offset = current->data.fileOffset+weaponTune_weaponHP_offset;
+                        float test = 0;
+                        read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&test);
+                        //Print this Weapon's HP
+#ifdef DATA_DUMP_MESSAGES
+                        printf("\t\t\t%s.tunedata's weapon HP: %f\n", current->data.fileName, test);
+#endif
+                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_lore, sizeof(new_npc_lore)) == 0) {
+                            printf("\t\t\t%s.tunedata's weapon HP successfully replaced at offset 0x%lX to %f\n", current->data.fileName, replace_offset, new_npc_lore);
+                        } else {
+                            printf("\t\t\tFailed to replace %s.tunedata's weapon HP.\n", current->data.fileName);
+                        }
+
+                        //Change number of grab loops
+                        int32_t weaponTune_GrabLoopTimes = 0x40;
+                    }
+                    break;//test next file
                 }
 
 /*      //This code prints out all .tunedata files bigger than 3000 bytes (npc files are around 6000 bytes)
@@ -519,7 +619,7 @@ int main(int argc, char *argv[]) {
         }
 */
     }//Collectables level loop
-
+    printf("\nPatching finished. Enjoy.");
     my_exit();
 }
 
