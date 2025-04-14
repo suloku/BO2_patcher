@@ -72,8 +72,7 @@ int main(int argc, char *argv[]) {
 
     if (get_config_KAIN(&config, &tempKAINconfig, "default"))
     {
-        printf("found");
-        printf("\t%s Presses:%d Multi:%f Level 5 HP:%f ReaverDamage:%f\n", tempKAINconfig.kainFile, tempKAINconfig.get_up_presses, tempKAINconfig.vampireWeaponMultiplier, tempKAINconfig.levels[5].hp, tempKAINconfig.weapons[KAINWEAPON_SOULREAVER].lastberserk_damage);
+        printf("\tKain: %s Presses:%d Multi:%f Level 5 HP:%f ReaverDamage:%f\n", tempKAINconfig.kainFile, tempKAINconfig.get_up_presses, tempKAINconfig.vampireWeaponMultiplier, tempKAINconfig.levels[5].hp, tempKAINconfig.weapons[KAINWEAPON_SOULREAVER].lastberserk_damage);
     }
 
     NPC_tunedata tempNPCconfig;
@@ -87,22 +86,34 @@ int main(int argc, char *argv[]) {
 
     if (get_config_CHEST(&config, &tempCHESTconfig, "col_lore", "levels1"))
     {
-        printf("found");
-        printf("\t%s %f %s\n", tempCHESTconfig.chestFile, tempCHESTconfig.lore, tempCHESTconfig.levels);
-        printf("\t%s %f %s\n", defaultCHEST.chestFile, defaultCHEST.lore, defaultCHEST.levels);
+        printf("\tChest: %s %f %s\n", tempCHESTconfig.chestFile, tempCHESTconfig.lore, tempCHESTconfig.levels);
+        //printf("\t%s %f %s\n", defaultCHEST.chestFile, defaultCHEST.lore, defaultCHEST.levels);
+    }
+        if (get_config_CHEST(&config, &tempCHESTconfig, "col_lore", "levels1"))
+    {
+        printf("\tChest: %s %f %s\n", tempCHESTconfig.chestFile, tempCHESTconfig.lore, tempCHESTconfig.levels);
+        //printf("\t%s %f %s\n", defaultCHEST.chestFile, defaultCHEST.lore, defaultCHEST.levels);
     }
 
     if (get_config_WEAPON(&config, &tempWEAPONconfig, "lsword", "level1"))
     {
-        printf("found");
-        printf("\t%s %f %d %s\n", tempWEAPONconfig.weaponFile, tempWEAPONconfig.HP, tempWEAPONconfig.grabLoops, tempWEAPONconfig.levels);
-        printf("\t%s %f %d %s\n", defaultWEAPON.weaponFile, defaultWEAPON.HP, defaultWEAPON.grabLoops, defaultWEAPON.levels);
+        printf("\tWeapon: %s %f %d %s\n", tempWEAPONconfig.weaponFile, tempWEAPONconfig.HP, tempWEAPONconfig.grabLoops, tempWEAPONconfig.levels);
+        //printf("\t%s %f %d %s\n", defaultWEAPON.weaponFile, defaultWEAPON.HP, defaultWEAPON.grabLoops, defaultWEAPON.levels);
     }
 
-    if (get_config_NPC(&config, &tempNPCconfig, "VampireHunter", "level1"))
+    if (get_config_NPC(&config, &tempNPCconfig, "VampireHunter", "level2"))
     {
-        printf("found");
-        printf("\t%s %f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
+        printf("\tNPC: %s %f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
+    }
+
+        if (get_config_NPC(&config, &tempNPCconfig, "VampireHunter", "level6"))
+    {
+        printf("\tNPC: %s %f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
+    }
+
+    if (get_config_NPC(&config, &tempNPCconfig, "VampireHunter", "level5"))
+    {
+        printf("\tNPC: %s %f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
     }
 
     free_config(&config);

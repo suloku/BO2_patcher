@@ -110,10 +110,10 @@ typedef struct {
 
 //Variables
 
-KAIN_tunedata defaultKAIN;
-NPC_tunedata defaultNPC;
-WEAPON_tunedata defaultWEAPON;
-CHEST_tunedata defaultCHEST;
+//KAIN_tunedata defaultKAIN;
+//NPC_tunedata defaultNPC;
+//WEAPON_tunedata defaultWEAPON;
+//CHEST_tunedata defaultCHEST;
 
 //Prototypes
 void print_config(const Config* config);

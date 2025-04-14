@@ -220,7 +220,8 @@ bool get_config_NPC(Config* config, NPC_tunedata* NPC, const char* npcName, cons
     bool found = false;
     bool found_default = false;
 
-    //Initialize with values we can detect
+    //Initialize with values we can detect.
+    NPC_tunedata defaultNPC;
     init_NPC_config(&defaultNPC);
 
     for (int i = 0; i < config->section_count; i++)
@@ -280,7 +281,7 @@ bool get_config_NPC(Config* config, NPC_tunedata* NPC, const char* npcName, cons
                 }
             }//For loop end
 
-            //Check if this file is set as default, and copy it
+            //Check if this file is set as default, and copy it to the default structure
             if (contains_word_exact(NPC->levels, "default"))
             {
                 //printf("\nFound default");
@@ -292,6 +293,18 @@ bool get_config_NPC(Config* config, NPC_tunedata* NPC, const char* npcName, cons
                 //We found the NPC, break
                 //printf("\nFound");
                 found = true;
+
+                //Fill any missing data with default data
+                if (found_default)
+                {
+                    if (NPC->HitPoints == -1) NPC->HitPoints = defaultNPC.HitPoints;
+                    if (NPC->CrawlHitPoints == -1) NPC->CrawlHitPoints = defaultNPC.CrawlHitPoints;
+                    if (NPC->healthSuckSpeed == -1) NPC->healthSuckSpeed = defaultNPC.healthSuckSpeed;
+                    if (NPC->normalMaxBlood == -1) NPC->normalMaxBlood = defaultNPC.normalMaxBlood;
+                    if (NPC->stealtKillMaxBlood == -1) NPC->stealtKillMaxBlood = defaultNPC.stealtKillMaxBlood;
+                    if (NPC->maxLore == -1) NPC->maxLore = defaultNPC.maxLore;
+                }
+
                 break;
             }
 
@@ -327,6 +340,7 @@ bool get_config_WEAPON(Config* config, WEAPON_tunedata* WEAPON, const char* weap
     bool found_default = false;
 
     //Initialize with values we can detect
+    WEAPON_tunedata defaultWEAPON;
     init_WEAPON_config(&defaultWEAPON);
 
     for (int i = 0; i < config->section_count; i++)
@@ -373,15 +387,23 @@ bool get_config_WEAPON(Config* config, WEAPON_tunedata* WEAPON, const char* weap
             //Check if this file is set as default, and copy it
             if (contains_word_exact(WEAPON->levels, "default"))
             {
-                printf("\nFound default\n");
+                //printf("\nFound default\n");
                 defaultWEAPON = *WEAPON;
                 found_default = true;
             }
             else if (contains_word_exact(WEAPON->levels, levelName))
             {
                 //We found the WEAPON for this level, break
-                printf("\nFound level\n");
+                //printf("\nFound level\n");
                 found = true;
+
+                //Fill any missing data with default data
+                if (found_default)
+                {
+                    if (WEAPON->HP == -1) WEAPON->HP = defaultWEAPON.HP;
+                    if (WEAPON->grabLoops == -1) WEAPON->grabLoops = defaultWEAPON.grabLoops;
+                }
+
                 break;
             }
 
@@ -415,6 +437,7 @@ bool get_config_CHEST(Config* config, CHEST_tunedata* CHEST, const char* chestNa
     bool found_default = false;
 
     //Initialize with values we can detect
+    CHEST_tunedata defaultCHEST;
     init_CHEST_config(&defaultCHEST);
 
     for (int i = 0; i < config->section_count; i++)
@@ -457,15 +480,22 @@ bool get_config_CHEST(Config* config, CHEST_tunedata* CHEST, const char* chestNa
             //Check if this file is set as default, and copy it
             if (contains_word_exact(CHEST->levels, "default"))
             {
-                printf("\nFound default\n");
+                //printf("\nFound default\n");
                 defaultCHEST = *CHEST;
                 found_default = true;
             }
             else if (contains_word_exact(CHEST->levels, levelName))
             {
                 //We found the CHEST for this level, break
-                printf("\nFound level\n");
+                //printf("\nFound level\n");
                 found = true;
+
+                //Fill any missing data with default data
+                if (found_default)
+                {
+                    if (CHEST->lore == -1) CHEST->lore = defaultCHEST.lore;
+                }
+
                 break;
             }
 
@@ -524,6 +554,7 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
     bool found_default = false;
 
     //Initialize with values we can detect
+    KAIN_tunedata defaultKAIN;
     init_KAIN_config(&defaultKAIN);
 
     for (int i = 0; i < config->section_count; i++)
@@ -848,11 +879,11 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                     }
                 } else if (strncmp(kv->key, "soulreaver_", 11) == 0)
                 {
-                    printf("\nSoulReaver\n");
+                    //printf("\nSoulReaver\n");
                     char attack[20];
                     if (sscanf(kv->key + 11, "%s", attack) == 1 )
                     {
-                        printf("\t%s\n", attack);
+                        //printf("\t%s\n", attack);
                         int cur_weapon = KAINWEAPON_SOULREAVER;
                         if (strcmp(attack, "1stattack_damage") == 0) {
                             KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
@@ -871,9 +902,7 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                         } else if (strcmp(attack, "berserk_damage") == 0) {
                             KAIN->weapons[cur_weapon].berserk_damage = atof(kv->value);
                         } else if (strcmp(attack, "lastberserk_damage") == 0) {
-                            printf("\ndamageberserk %d, %d\n", KAINWEAPON_SOULREAVER, KAINWEAPON_HANDS);
                             KAIN->weapons[cur_weapon].lastberserk_damage = atof(kv->value);
-                            printf("\ndamageberserk %f\n", KAIN->weapons[cur_weapon].lastberserk_damage);
                         } else if (strcmp(attack, "jump_damage") == 0) {
                             KAIN->weapons[cur_weapon].jump_damage = atof(kv->value);
                         } else if (strcmp(attack, "grab_throw_damage") == 0) {
@@ -892,15 +921,48 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
             //Check if this file is set as default, and copy it
             if (contains_word_exact(KAIN->kainFile, "default"))
             {
-                printf("\nFound default\n");
+                //printf("\nFound default\n");
                 defaultKAIN = *KAIN;
                 found_default = true;
             }
             else if (contains_word_exact(KAIN->kainFile, kainFile))
             {
-                //We found the CHEST for this level, break
-                printf("\nFound kainFile config\n");
+                //We found the kain file config for this kain file, break
+                //printf("\nFound kain file config\n");
                 found = true;
+
+                //Fill any missing data with default data
+                if (found_default)
+                {
+                    //KAIN->kainFile[0] = '\0';
+                    if ( KAIN->wipe_chance == -1) KAIN->wipe_chance = defaultKAIN.wipe_chance;
+                    if ( KAIN->lorePerParticle == -1) KAIN->lorePerParticle = defaultKAIN.lorePerParticle;
+                    if ( KAIN->get_up_presses == -1) KAIN->get_up_presses = defaultKAIN.get_up_presses;
+                    if ( KAIN->vampireWeaponMultiplier == -1) KAIN->vampireWeaponMultiplier = defaultKAIN.vampireWeaponMultiplier;
+                    if ( KAIN->maxLoreLevels == -1) KAIN->maxLoreLevels = defaultKAIN.maxLoreLevels;
+                    for (int i = 0; i < KAIN_MAX_LEVELS; i++)
+                    {
+                        if (KAIN->levels[i].hp == -1) KAIN->levels[i].hp = defaultKAIN.levels[i].hp;
+                        if (KAIN->levels[i].lore == -1) KAIN->levels[i].lore = defaultKAIN.levels[i].lore;
+                    }
+                    for (int i = 0; i < KAIN_MAX_WEAPONS; i++)
+                    {
+                        //KAIN->weapons[i].name[0] = '\0';
+                        if (KAIN->weapons[i].first_attack_damage == -1) KAIN->weapons[i].first_attack_damage = defaultKAIN.weapons[i].first_attack_damage;
+                        if (KAIN->weapons[i].second_attack_damage == -1) KAIN->weapons[i].second_attack_damage = defaultKAIN.weapons[i].second_attack_damage;
+                        if (KAIN->weapons[i].third_attack_damage == -1) KAIN->weapons[i].third_attack_damage = defaultKAIN.weapons[i].third_attack_damage;
+                        if (KAIN->weapons[i].ground_damage == -1) KAIN->weapons[i].ground_damage = defaultKAIN.weapons[i].ground_damage;
+                        if (KAIN->weapons[i].grab_loop_damage == -1) KAIN->weapons[i].grab_loop_damage = defaultKAIN.weapons[i].grab_loop_damage;
+                        if (KAIN->weapons[i].grab_final_damage == -1) KAIN->weapons[i].grab_final_damage = defaultKAIN.weapons[i].grab_final_damage;
+                        if (KAIN->weapons[i].fury_damage == -1) KAIN->weapons[i].fury_damage = defaultKAIN.weapons[i].fury_damage;
+                        if (KAIN->weapons[i].jump_damage == -1) KAIN->weapons[i].jump_damage = defaultKAIN.weapons[i].jump_damage;
+                        if (KAIN->weapons[i].berserk_damage == -1) KAIN->weapons[i].berserk_damage = defaultKAIN.weapons[i].berserk_damage;
+                        if (KAIN->weapons[i].lastberserk_damage == -1) KAIN->weapons[i].lastberserk_damage = defaultKAIN.weapons[i].lastberserk_damage;
+                        if (KAIN->weapons[i].grab_throw_damage == -1) KAIN->weapons[i].grab_throw_damage = defaultKAIN.weapons[i].grab_throw_damage;
+                    }
+                    KainWeaponData weapons[KAIN_MAX_WEAPONS];
+                }
+
                 break;
             }
 
