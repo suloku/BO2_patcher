@@ -40,3 +40,15 @@ const char *get_filename(const char *path) {
     // If no separator is found, return the original path (it is already a filename)
     return (last_sep) ? last_sep + 1 : path;
 }
+
+char* remove_extension(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    size_t len = (dot) ? (size_t)(dot - filename) : strlen(filename);
+
+    char *result = malloc(len + 1);
+    if (result) {
+        strncpy(result, filename, len);
+        result[len] = '\0';
+    }
+    return result;
+}

@@ -22,7 +22,8 @@
 //#define DATA_DUMP_MESSAGES
 #define OUTPUT_TUNEDATA_FILES
 
-extern NPC_tunedata defaultNPC;
+Config config;
+char *FilenameNoExtension;
 
 void my_exit();
 
@@ -60,20 +61,17 @@ int main(int argc, char *argv[]) {
     }
     printf ("RunPath: %s\n", runPath);
 
+    //Load configuration file
     append_directory(runPath, "config.ini", filename, sizeof(filename));
-    Config config;
     init_config(&config);
-
-    parse_ini(filename, &config);
+    if (parse_ini(filename, &config) == -1)
+    {
+        my_exit();
+    }
     //print_config(&config);
 
     KAIN_tunedata tempKAINconfig;
-    init_NPC_config(&tempKAINconfig);
-
-    if (get_config_KAIN(&config, &tempKAINconfig, "default"))
-    {
-        printf("\tKain: %s Presses:%d Multi:%f Level 5 HP:%f ReaverDamage:%f\n", tempKAINconfig.kainFile, tempKAINconfig.get_up_presses, tempKAINconfig.vampireWeaponMultiplier, tempKAINconfig.levels[5].hp, tempKAINconfig.weapons[KAINWEAPON_SOULREAVER].lastberserk_damage);
-    }
+    init_KAIN_config(&tempKAINconfig);
 
     NPC_tunedata tempNPCconfig;
     init_NPC_config(&tempNPCconfig);
@@ -84,41 +82,48 @@ int main(int argc, char *argv[]) {
     CHEST_tunedata tempCHESTconfig;
     init_CHEST_config(&tempCHESTconfig);
 
+    /*
+    //Some test code for config loading
+    if (get_config_KAIN(&config, &tempKAINconfig, "default"))
+    {
+        printf("\tKain: %s Presses:%d Multi:%06.2f Level 5 HP:%06.2f ReaverDamage:%06.2f\n", tempKAINconfig.kainFile, tempKAINconfig.get_up_presses, tempKAINconfig.vampireWeaponMultiplier, tempKAINconfig.levels[5].hp, tempKAINconfig.weapons[KAINWEAPON_SOULREAVER].lastberserk_damage);
+    }
+
     if (get_config_CHEST(&config, &tempCHESTconfig, "col_lore", "levels1"))
     {
-        printf("\tChest: %s %f %s\n", tempCHESTconfig.chestFile, tempCHESTconfig.lore, tempCHESTconfig.levels);
-        //printf("\t%s %f %s\n", defaultCHEST.chestFile, defaultCHEST.lore, defaultCHEST.levels);
+        printf("\tChest: %s %06.2f %s\n", tempCHESTconfig.chestFile, tempCHESTconfig.lore, tempCHESTconfig.levels);
+        //printf("\t%s %06.2f %s\n", defaultCHEST.chestFile, defaultCHEST.lore, defaultCHEST.levels);
     }
         if (get_config_CHEST(&config, &tempCHESTconfig, "col_lore", "levels1"))
     {
-        printf("\tChest: %s %f %s\n", tempCHESTconfig.chestFile, tempCHESTconfig.lore, tempCHESTconfig.levels);
-        //printf("\t%s %f %s\n", defaultCHEST.chestFile, defaultCHEST.lore, defaultCHEST.levels);
+        printf("\tChest: %s %06.2f %s\n", tempCHESTconfig.chestFile, tempCHESTconfig.lore, tempCHESTconfig.levels);
+        //printf("\t%s %06.2f %s\n", defaultCHEST.chestFile, defaultCHEST.lore, defaultCHEST.levels);
     }
 
     if (get_config_WEAPON(&config, &tempWEAPONconfig, "lsword", "level1"))
     {
-        printf("\tWeapon: %s %f %d %s\n", tempWEAPONconfig.weaponFile, tempWEAPONconfig.HP, tempWEAPONconfig.grabLoops, tempWEAPONconfig.levels);
-        //printf("\t%s %f %d %s\n", defaultWEAPON.weaponFile, defaultWEAPON.HP, defaultWEAPON.grabLoops, defaultWEAPON.levels);
+        printf("\tWeapon: %s %06.2f %d %s\n", tempWEAPONconfig.weaponFile, tempWEAPONconfig.HP, tempWEAPONconfig.grabLoops, tempWEAPONconfig.levels);
+        //printf("\t%s %06.2f %d %s\n", defaultWEAPON.weaponFile, defaultWEAPON.HP, defaultWEAPON.grabLoops, defaultWEAPON.levels);
     }
 
     if (get_config_NPC(&config, &tempNPCconfig, "VampireHunter", "level2"))
     {
-        printf("\tNPC: %s %f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
+        printf("\tNPC: %s %06.2f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
     }
 
         if (get_config_NPC(&config, &tempNPCconfig, "VampireHunter", "level6"))
     {
-        printf("\tNPC: %s %f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
+        printf("\tNPC: %s %06.2f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
     }
 
     if (get_config_NPC(&config, &tempNPCconfig, "VampireHunter", "level5"))
     {
-        printf("\tNPC: %s %f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
+        printf("\tNPC: %s %06.2f\n\t%s\n", tempNPCconfig.npcFile, tempNPCconfig.HitPoints, tempNPCconfig.levels);
     }
 
-    free_config(&config);
-
     my_exit();
+
+    */
 
     //Check correct path
     append_directory(runPath, "bo2.exe", filename, sizeof(filename));
@@ -129,8 +134,8 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    //Check that lore in chests and lorePerParticle are correctly divisible
-
+    //TODO: reimplement lore per particle checks
+    /*
     if (fmod(new_RedChest_Lore, lorePerParticle) != 0)
     {
         printf("RedChest Lore amount (%.2f) is not divisible by Lore Particles (%.2f)\n", new_RedChest_Lore, lorePerParticle);
@@ -141,6 +146,7 @@ int main(int argc, char *argv[]) {
         printf("BlueChest Lore amount (%.2f) is not divisible by Lore Particles (%.2f)\n", new_BlueChest_Lore, lorePerParticle);
         my_exit();
     }
+    */
 
     long replace_offset;
 
@@ -188,79 +194,405 @@ int main(int argc, char *argv[]) {
         {
             if (strcmp(current->data.fileType, "tunedata")==0 && strcmp(current->data.fileName, "kain")==0)
             {
+                //We found a kain*.tunedata file. Load the config for it
+                //note: missing values will be loaded from the "default" entry if found
+                if (FilenameNoExtension) free (FilenameNoExtension);
+                FilenameNoExtension = remove_extension(get_filename(filename));
+                get_config_KAIN(&config, &tempKAINconfig, FilenameNoExtension);
+
+                printf("\tFound %s.tunedata. Applying config...\n", current->data.fileName);
+
                 //Change wipe chance
                 replace_offset = current->data.fileOffset+wipe_chance_offset;
-                if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&wipe_chance, sizeof(wipe_chance)) == 0)
+                if (tempKAINconfig.wipe_chance != -1)
                 {
-                    printf("\t\tWipe Chance successfully replaced at offset 0x%lX to %f\n", replace_offset, wipe_chance);
-                } else
-                {
-                    printf("\t\tFailed to replace wipe chance.\n");
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.wipe_chance, sizeof(tempKAINconfig.wipe_chance)) == 0)
+                    {
+                        printf("\t\tWipe Chance: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.wipe_chance);
+                    } else
+                    {
+                        printf("\t\tWipe Chance: Failed to replace.\n");
+                    }
                 }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    printf("\t\tWipe Chance:  keeping value in file (no setting found) %06.2f.\n", temp);
+                }
+
                 //Change Lore Per Particle
                 replace_offset = current->data.fileOffset+lorePerParticle_offset;
-                if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&lorePerParticle, sizeof(lorePerParticle)) == 0) {
-                    printf("\t\tLore particles successfully replaced at offset 0x%lX to %f\n", replace_offset, lorePerParticle);
-                } else {
-                    printf("\t\tFailed to replace Lore particles.\n");
+                if (tempKAINconfig.lorePerParticle != -1)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.lorePerParticle, sizeof(tempKAINconfig.lorePerParticle)) == 0)
+                    {
+                        printf("\t\tLore particles: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.lorePerParticle);
+                    } else
+                    {
+                        printf("\t\tLore particles: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    printf("\t\tLore particles:  keeping value in file (no setting found) %06.2f.\n", temp);
                 }
 
                 //Change number of button presses for Kain to get up after knockdown
                 replace_offset = current->data.fileOffset+KainHitReactControls_offset;
-                if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&kain_get_up_presses, sizeof(kain_get_up_presses)) == 0) {
-                    printf("\t\tKnockdown button presses successfully replaced at offset 0x%lX to %d\n", replace_offset, kain_get_up_presses);
-                } else {
-                    printf("\t\tFailed to replace knockdown button presses.\n");
+                if (tempKAINconfig.get_up_presses != -1)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.get_up_presses, sizeof(tempKAINconfig.get_up_presses)) == 0)
+                    {
+                        printf("\t\tKnockdown button presses: replaced at offset 0x%lX to %03d\n", replace_offset, tempKAINconfig.get_up_presses);
+                    } else
+                    {
+                        printf("\t\tKnockdown button presses: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    int32_t temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    printf("\t\tKnockdown button presses:  keeping value in file (no setting found) %03d.\n", temp);
                 }
 
                 //Change Vampire Weapon Damage Multiplier
                 replace_offset = current->data.fileOffset+vampireWeaponDamageMultiplier_offset;
-                if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&VampireWeaponMultiplier, sizeof(VampireWeaponMultiplier)) == 0) {
-                    printf("\t\tVampire Weapon Damage Multiplier successfully replaced at offset 0x%lX to %f\n", replace_offset, VampireWeaponMultiplier);
-                } else {
-                    printf("\t\tFailed to replace Vampire Weapon Damage Multiplier.\n");
+                if (tempKAINconfig.vampireWeaponMultiplier != -1)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.vampireWeaponMultiplier, sizeof(tempKAINconfig.vampireWeaponMultiplier)) == 0)
+                    {
+                        printf("\t\tVampire Weapon Damage Multiplier: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.vampireWeaponMultiplier);
+                    } else
+                    {
+                        printf("\t\tVampire Weapon Damage Multiplier: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    printf("\t\tVampire Weapon Damage Multiplier: keeping value in file (no setting found) %06.2f.\n", temp);
                 }
 
                 //Change Max Lore Levels
                 replace_offset = current->data.fileOffset+numLoreLevels_offset;
-                if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&kain_MaxLoreLevels, sizeof(kain_MaxLoreLevels)) == 0) {
-                    printf("\t\tMax Lore Levels successfully replaced at offset 0x%lX to %d\n", replace_offset, kain_MaxLoreLevels);
-                } else {
-                    printf("\t\tFailed to replace Max Lore Levels.\n");
+                if (tempKAINconfig.maxLoreLevels != -1)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.maxLoreLevels, sizeof(tempKAINconfig.maxLoreLevels)) == 0)
+                    {
+                        printf("\t\tMax Lore Levels: replaced at offset 0x%lX to %03d\n", replace_offset, tempKAINconfig.maxLoreLevels);
+                    } else
+                    {
+                        printf("\t\tMax Lore Levels: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    int32_t temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    printf("\t\tMax Lore Levels: keeping value in file (no setting found) %03d\n", temp);
                 }
 
                 //Change Kain's level data
                 //Patch Lore
                 for (j=0;j<KAIN_TOTAL_LEVELS;j++)
                 {
-                    int levelToChange = j;
-                    float temp = 0;
-                    replace_offset = current->data.fileOffset+get_kain_level_lore_offset(levelToChange);
-                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    if (temp != kainlevel_lore_values[levelToChange])
+                    replace_offset = current->data.fileOffset+get_kain_level_lore_offset(j);
+                    if (tempKAINconfig.levels[j].lore != -1)
                     {
-                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&kainlevel_lore_values[levelToChange], sizeof(kainlevel_lore_values[levelToChange])) == 0) {
-                            if (kainlevel_lore_values[levelToChange] == FLT_MAX)
-                                printf("\t\tLevel %d's Lore successfully replaced at offset 0x%lX to FLT_MAX\n", levelToChange, replace_offset);
-                            else
-                                printf("\t\tLevel %d's Lore successfully replaced at offset 0x%lX to %f\n", levelToChange, replace_offset, kainlevel_lore_values[levelToChange]);
-                        } else {
-                            printf("\t\tFailed to replace Level %d's Lore.\n", levelToChange);
+                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.levels[j].lore, sizeof(tempKAINconfig.levels[j].lore)) == 0)
+                        {
+                            printf("\t\t\tKain's Level %d Lore:\treplaced at offset 0x%lX to %06.2f\n", j, replace_offset, tempKAINconfig.levels[j].lore);
+                        } else
+                        {
+                            printf("\t\t\tKain's Level %d Lore:\tFailed to replace.\n", j);
                         }
                     }
-                    //Patch HP
-                    replace_offset = current->data.fileOffset+get_kain_level_hp_offset(levelToChange);
-                    read_4_bytes_from_file(filename, replace_offset, ( unsigned char *)&temp);
-                    if (temp != kainlevel_hp_values[levelToChange])
+                    else
                     {
-                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&kainlevel_hp_values[levelToChange], sizeof(kainlevel_hp_values[levelToChange])) == 0) {
-                            printf("\t\tLevel %d's HP successfully replaced at offset 0x%lX to %f\n", levelToChange, replace_offset, kainlevel_hp_values[levelToChange]);
-                        } else {
-                            printf("\t\tFailed to replace Level %d's Lore.\n", levelToChange);
+                        float temp = 0;
+                        read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                        printf("\t\tKain's Level %d Lore:\tkeeping value in file (no setting found) %06.2f.\n", j, temp);
+                    }
+
+
+                    //Patch HP
+                    replace_offset = current->data.fileOffset+get_kain_level_hp_offset(j);
+                    if (tempKAINconfig.levels[j].hp != -1)
+                    {
+                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.levels[j].hp, sizeof(tempKAINconfig.levels[j].hp)) == 0)
+                        {
+                            printf("\t\t\tKain's Level %d HP:\treplaced at offset 0x%lX to %06.2f\n", j, replace_offset, tempKAINconfig.levels[j].hp);
+                        } else
+                        {
+                            printf("\t\t\tKain's Level %d HP:\tFailed to replace.\n", j);
                         }
+                    }
+                    else
+                    {
+                        float temp = 0;
+                        read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                        printf("\t\t\tKain's Level %d HP:\tkeeping value in file (no setting found) %06.2f\n", j, temp);
                     }
                 }
-                //Since we found the kain.tunedata file and modified it, we are done
+
+                //Kain Weapon Damage
+                printf("\t\tKain Weapon Damage:\n");
+                for (j=0; j<KAIN_TOTAL_WEAPONS; j++)
+                {
+                    printf("\t\t    %s\n", KainWeaponNames[j]);
+                    //Go trough all weapons
+                    //The offset being 0x00 indicates that weapon doesn't have this specific damage in Kain's damage table
+
+                    //1st attack
+                    if (weapon_offsets[j].first_attack != 0)
+                    {
+                        replace_offset = current->data.fileOffset+weapon_offsets[j].first_attack;
+                        if (tempKAINconfig.weapons[j].first_attack_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].first_attack_damage , sizeof(tempKAINconfig.weapons[j].first_attack_damage )) == 0)
+                            {
+                                printf("\t\t\t1st attack damage:\t\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].first_attack_damage );
+                            } else
+                            {
+                                printf("\t\t\t1st attack damage:\t\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\t1st attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                    //2nd attack
+                    if (weapon_offsets[j].second_attack != 0)
+                    {
+                       replace_offset = current->data.fileOffset+weapon_offsets[j].second_attack;
+                        if (tempKAINconfig.weapons[j].second_attack_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].second_attack_damage , sizeof(tempKAINconfig.weapons[j].second_attack_damage )) == 0)
+                            {
+                                printf("\t\t\t2nd attack damage:\t\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].second_attack_damage );
+                            } else
+                            {
+                                printf("\t\t\t2nd attack damage:\t\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\t2nd attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                    //3rd attack
+                    if (weapon_offsets[j].third_attack != 0)
+                    {
+                       replace_offset = current->data.fileOffset+weapon_offsets[j].third_attack;
+                        if (tempKAINconfig.weapons[j].third_attack_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].third_attack_damage , sizeof(tempKAINconfig.weapons[j].third_attack_damage )) == 0)
+                            {
+                                printf("\t\t\t3rd attack damage:\t\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].third_attack_damage );
+                            } else
+                            {
+                                printf("\t\t\t3rd attack damage:\t\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\t3rd attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                    //Ground Damage
+                    if (weapon_offsets[j].ground != 0)
+                    {
+                       replace_offset = current->data.fileOffset+weapon_offsets[j].ground;
+                        if (tempKAINconfig.weapons[j].ground_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].ground_damage , sizeof(tempKAINconfig.weapons[j].ground_damage )) == 0)
+                            {
+                                printf("\t\t\tGround attack damage:\t\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].ground_damage );
+                            } else
+                            {
+                                printf("\t\t\tGround attack damage:\t\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\tGround attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                    //Grab Loop Damage
+                    if (weapon_offsets[j].grab_loop != 0)
+                    {
+                       replace_offset = current->data.fileOffset+weapon_offsets[j].grab_loop;
+                        if (tempKAINconfig.weapons[j].grab_loop_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].grab_loop_damage , sizeof(tempKAINconfig.weapons[j].grab_loop_damage )) == 0)
+                            {
+                                printf("\t\t\tGrab Loop attack damage:\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].grab_loop_damage );
+                            } else
+                            {
+                                printf("\t\t\tGrab Loop attack damage:\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\tGrab Loop attack damage:\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                    //Grab Final Damage
+                    if (weapon_offsets[j].grab_final != 0)
+                    {
+                       replace_offset = current->data.fileOffset+weapon_offsets[j].grab_final;
+                        if (tempKAINconfig.weapons[j].grab_final_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].grab_final_damage , sizeof(tempKAINconfig.weapons[j].grab_final_damage )) == 0)
+                            {
+                                printf("\t\t\tGrab Final attack damage:\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].grab_final_damage );
+                            } else
+                            {
+                                printf("\t\t\tGrab Final attack damage:\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\tGrab Final attack damage:\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                    //Grab Throw Damage
+                    if (weapon_offsets[j].grab_throw != 0)
+                    {
+                       replace_offset = current->data.fileOffset+weapon_offsets[j].grab_throw;
+                        if (tempKAINconfig.weapons[j].grab_throw_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].grab_throw_damage , sizeof(tempKAINconfig.weapons[j].grab_throw_damage )) == 0)
+                            {
+                                printf("\t\t\tGrab Throw attack damage:\t\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].grab_throw_damage );
+                            } else
+                            {
+                                printf("\t\t\tGrab Throw attack damage:\t\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\tGrab Throw attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                    //Fury Damage
+                    if (weapon_offsets[j].charge_move != 0)
+                    {
+                       replace_offset = current->data.fileOffset+weapon_offsets[j].charge_move;
+                        if (tempKAINconfig.weapons[j].fury_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].fury_damage , sizeof(tempKAINconfig.weapons[j].fury_damage )) == 0)
+                            {
+                                printf("\t\t\tFury attack damage:\t\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].fury_damage );
+                            } else
+                            {
+                                printf("\t\t\tFury attack damage:\t\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\tFury attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                    //Jump Damage
+                    if (weapon_offsets[j].super_jump != 0)
+                    {
+                       replace_offset = current->data.fileOffset+weapon_offsets[j].super_jump;
+                        if (tempKAINconfig.weapons[j].jump_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].jump_damage , sizeof(tempKAINconfig.weapons[j].jump_damage )) == 0)
+                            {
+                                printf("\t\t\tJump attack damage:\t\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].jump_damage );
+                            } else
+                            {
+                                printf("\t\t\tJump attack damage:\t\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\tJump attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                    //Berserk Damage
+                    if (weapon_offsets[j].speed_attack != 0)
+                    {
+                       replace_offset = current->data.fileOffset+weapon_offsets[j].speed_attack;
+                        if (tempKAINconfig.weapons[j].berserk_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].berserk_damage , sizeof(tempKAINconfig.weapons[j].berserk_damage )) == 0)
+                            {
+                                printf("\t\t\tBerserk attack damage:\t\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].berserk_damage );
+                            } else
+                            {
+                                printf("\t\t\tBerserk attack damage:\t\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\tBerserk attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                    //Final Berserk Damage
+                    if (weapon_offsets[j].last_speed_attack != 0)
+                    {
+                       replace_offset = current->data.fileOffset+weapon_offsets[j].last_speed_attack;
+                        if (tempKAINconfig.weapons[j].lastberserk_damage != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].lastberserk_damage , sizeof(tempKAINconfig.weapons[j].lastberserk_damage )) == 0)
+                            {
+                                printf("\t\t\tBerserk final attack damage:\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.weapons[j].lastberserk_damage );
+                            } else
+                            {
+                                printf("\t\t\tBerserk final attack damage:\tFailed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\tBerserk final attack damage:\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        }
+                    }
+
+                }//Weapon damage loop end
+
+                //Since we found the kain*.tunedata file and modified it, we are done
                 break;
             }
 
@@ -392,7 +724,7 @@ int main(int argc, char *argv[]) {
                     printf("\t\tcoll_lore.tunedata\n");
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_RedChest_Lore, sizeof(new_RedChest_Lore)) == 0) {
-                        printf("\t\t\tRed Chest lore successfully replaced at offset 0x%lX to %f\n", replace_offset, new_RedChest_Lore);
+                        printf("\t\t\tRed Chest lore successfully replaced at offset 0x%lX to %06.2f\n", replace_offset, new_RedChest_Lore);
                     } else {
                         printf("\t\t\tFailed to replace Red Chest lore.\n");
                     }
@@ -405,7 +737,7 @@ int main(int argc, char *argv[]) {
                     printf("\t\tcoll_biglore.tunedata\n");
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_BlueChest_Lore, sizeof(new_BlueChest_Lore)) == 0) {
-                        printf("\t\t\tBlue Chest lore successfully replaced at offset 0x%lX to %f\n", replace_offset, new_BlueChest_Lore);
+                        printf("\t\t\tBlue Chest lore successfully replaced at offset 0x%lX to %06.2f\n", replace_offset, new_BlueChest_Lore);
                     } else {
                         printf("\t\t\tFailed to replace Blue Chest lore.\n");
                     }
@@ -429,7 +761,7 @@ int main(int argc, char *argv[]) {
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&npc_hitpoints);
                         //Print this NPCs HP
 #ifdef DATA_DUMP_MESSAGES
-                        printf("\t\t\t%s.tunedata's HP: %f\n", current->data.fileName, npc_hitpoints);
+                        printf("\t\t\t%s.tunedata's HP: %06.2f\n", current->data.fileName, npc_hitpoints);
 #endif
                     //Replace Max Blood
                         replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_normalMaxBlood_offset;
@@ -437,7 +769,7 @@ int main(int argc, char *argv[]) {
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&MaxBlood);
                         //Print this NPCs Max Blood
 #ifdef DATA_DUMP_MESSAGES
-                        printf("\t\t\t%s.tunedata's Max Blood: %f\n", current->data.fileName, MaxBlood);
+                        printf("\t\t\t%s.tunedata's Max Blood: %06.2f\n", current->data.fileName, MaxBlood);
                         //Replace code
 #endif
                     //Replace Max Stealth Blood
@@ -446,7 +778,7 @@ int main(int argc, char *argv[]) {
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&test);
                         //Print this NPCs Max Stealth Blood
 #ifdef DATA_DUMP_MESSAGES
-                        printf("\t\t\t%s.tunedata's Max Stealh Blood: %f\n", current->data.fileName, test);
+                        printf("\t\t\t%s.tunedata's Max Stealh Blood: %06.2f\n", current->data.fileName, test);
 #endif
                     //Replace Bloodsuck Rate
                         replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_healthSuckSpeed_offset;
@@ -464,11 +796,11 @@ int main(int argc, char *argv[]) {
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&test);
                         //Print this NPCs Bloodsuck rate
 #ifdef DATA_DUMP_MESSAGES
-                        printf("\t\t\t%s.tunedata's Bloodsuck rate: %f hp per second\n", current->data.fileName, test);
+                        printf("\t\t\t%s.tunedata's Bloodsuck rate: %06.2f hp per second\n", current->data.fileName, test);
 #endif
                         //Replace code
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_bloodsuck_rate, sizeof(new_bloodsuck_rate)) == 0) {
-                            printf("\t\t\t%s.tunedata's Bloodsuck rate successfully replaced at offset 0x%lX to %f\n", current->data.fileName, replace_offset, new_bloodsuck_rate);
+                            printf("\t\t\t%s.tunedata's Bloodsuck rate successfully replaced at offset 0x%lX to %06.2f\n", current->data.fileName, replace_offset, new_bloodsuck_rate);
                         } else {
                             printf("\t\t\tFailed to replace %s.tunedata's Bloodsuck rate.\n", current->data.fileName);
                         }
@@ -476,7 +808,7 @@ int main(int argc, char *argv[]) {
                     //Replace Lore
                         replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_maxLore_offset;
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_lore, sizeof(new_npc_lore)) == 0) {
-                            printf("\t\t\t%s.tunedata's lore successfully replaced at offset 0x%lX to %f\n", current->data.fileName, replace_offset, new_npc_lore);
+                            printf("\t\t\t%s.tunedata's lore successfully replaced at offset 0x%lX to %06.2f\n", current->data.fileName, replace_offset, new_npc_lore);
                         } else {
                             printf("\t\t\tFailed to replace %s.tunedata's lore.\n", current->data.fileName);
                         }
@@ -487,10 +819,10 @@ int main(int argc, char *argv[]) {
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&test);
                         //Print this NPCs crawl hitpoints
 #ifdef DATA_DUMP_MESSAGES
-                        printf("\t\t\t%s.tunedata's crawl hitpoints: %f\n", current->data.fileName, test);
+                        printf("\t\t\t%s.tunedata's crawl hitpoints: %06.2f\n", current->data.fileName, test);
 #endif
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_crawl_hitpoints, sizeof(new_npc_crawl_hitpoints)) == 0) {
-                            printf("\t\t\t%s.tunedata's crawl hitpoints successfully replaced at offset 0x%lX to %f\n", current->data.fileName, replace_offset, new_npc_crawl_hitpoints);
+                            printf("\t\t\t%s.tunedata's crawl hitpoints successfully replaced at offset 0x%lX to %06.2f\n", current->data.fileName, replace_offset, new_npc_crawl_hitpoints);
                         } else {
                             printf("\t\t\tFailed to replace %s.tunedata's lore.\n", current->data.fileName);
                         }
@@ -514,10 +846,10 @@ int main(int argc, char *argv[]) {
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&test);
                         //Print this Weapon's HP
 #ifdef DATA_DUMP_MESSAGES
-                        printf("\t\t\t%s.tunedata's weapon HP: %f\n", current->data.fileName, test);
+                        printf("\t\t\t%s.tunedata's weapon HP: %06.2f\n", current->data.fileName, test);
 #endif
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_lore, sizeof(new_npc_lore)) == 0) {
-                            printf("\t\t\t%s.tunedata's weapon HP successfully replaced at offset 0x%lX to %f\n", current->data.fileName, replace_offset, new_npc_lore);
+                            printf("\t\t\t%s.tunedata's weapon HP successfully replaced at offset 0x%lX to %06.2f\n", current->data.fileName, replace_offset, new_npc_lore);
                         } else {
                             printf("\t\t\tFailed to replace %s.tunedata's weapon HP.\n", current->data.fileName);
                         }
@@ -533,7 +865,7 @@ int main(int argc, char *argv[]) {
                 {
                     float tunedata_lore = 0;
                     read_4_bytes_from_file(filename, current->data.fileOffset+npc_lore_offset, (unsigned char*)&tunedata_lore);
-                    printf("\t\t\tFile Name: %s | Type: %s | Size: %d bytes | Lore: %f\n",
+                    printf("\t\t\tFile Name: %s | Type: %s | Size: %d bytes | Lore: %06.2f\n",
                        current->data.fileName ? current->data.fileName : "NULL",
                        current->data.fileType ? current->data.fileType : "NULL",
                        current->data.fileLength, tunedata_lore);
@@ -553,7 +885,7 @@ int main(int argc, char *argv[]) {
                 {
                     float tunedata_lore = 0;
                     read_4_bytes_from_file(filename, current->data.fileOffset+npc_lore_offset, (unsigned char*)&tunedata_lore);
-                    printf("\t\tFile Name: %s | Type: %s | Size: %d bytes | Lore: %f\n",
+                    printf("\t\tFile Name: %s | Type: %s | Size: %d bytes | Lore: %06.2f\n",
                        current->data.fileName ? current->data.fileName : "NULL",
                        current->data.fileType ? current->data.fileType : "NULL",
                        current->data.fileLength, tunedata_lore);
@@ -645,6 +977,7 @@ int main(int argc, char *argv[]) {
 
 void my_exit()
 {
+    free_config(&config);
     printf("\nPress a key and then Enter to continue...\n");
     getchar();  // Waits for a character + Enter
     exit(0);

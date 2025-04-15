@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#define KAIN_TOTAL_WEAPONS 10
+
 /*
 Available Retail Game Weapons Damage
 
@@ -117,6 +119,19 @@ speedattack    0.0
 lastspeedattack    1000.0
 */
 
+char* KainWeaponNames[] = {
+    "Claws",
+    "Long Swords",
+    "Daggers",
+    "Short Axes",
+    "Crossbow",
+    "Double-Bladed Sword",
+    "Broadsword/Long Axe",
+    "Spiked Club/Scepter",
+    "Mace",
+    "Soul Reaver"
+};
+
 //Offsets for each weapon's damage values
 typedef struct {
     int first_attack;
@@ -132,7 +147,7 @@ typedef struct {
     int grab_throw;
 } WeaponOffsets;
 
-WeaponOffsets weapons[] = {
+WeaponOffsets weapon_offsets[] = {
     // Hands (Claws)
     { 0x1064, 0x106C, 0x1074, 0x107C, 0x1084, 0x108C, 0x1094, 0x10A4, 0x10AC, 0x109C, 0x10B4 },
     // Lsword (Long Sword(Lsword)/Cutlass(Lsword4)/Scimitar(Lsword2) and unused lsword3)

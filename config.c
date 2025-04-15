@@ -76,11 +76,11 @@ void add_key_value(Section* section, const char* key, const char* value) {
 }
 
 // Function to parse the INI file
-void parse_ini(const char* filename, Config* config) {
+int parse_ini(const char* filename, Config* config) {
     FILE* file = fopen(filename, "r");
     if (!file) {
-        perror("Error opening file");
-        exit(EXIT_FAILURE);
+        printf("Error opening config file (%s)", filename);
+        return -1;
     }
 
     char line[256];
@@ -123,6 +123,8 @@ void parse_ini(const char* filename, Config* config) {
     }
 
     fclose(file);
+
+    return 1;
 }
 
 // Function to print the parsed configuration
@@ -234,7 +236,7 @@ bool get_config_NPC(Config* config, NPC_tunedata* NPC, const char* npcName, cons
             for (int j = 0; j < section->key_count; j++)
             {
                 const KeyValue* kv = &section->keys[j];
-                trim_leading_spaces(kv->value);
+                trim_leading_spaces((char*)kv->value);
 
                 if ( j == 0 && strcmp(kv->value, npcName)!= 0)
                 {
@@ -353,7 +355,7 @@ bool get_config_WEAPON(Config* config, WEAPON_tunedata* WEAPON, const char* weap
             for (int j = 0; j < section->key_count; j++)
             {
                 const KeyValue* kv = &section->keys[j];
-                trim_leading_spaces(kv->value);
+                trim_leading_spaces((char*)kv->value);
 
                 if ( j == 0 && strcmp(kv->value, weaponName)!= 0)
                 {
@@ -450,7 +452,7 @@ bool get_config_CHEST(Config* config, CHEST_tunedata* CHEST, const char* chestNa
             for (int j = 0; j < section->key_count; j++)
             {
                 const KeyValue* kv = &section->keys[j];
-                trim_leading_spaces(kv->value);
+                trim_leading_spaces((char*)kv->value);
 
                 if ( j == 0 && strcmp(kv->value, chestName)!= 0)
                 {
@@ -522,10 +524,10 @@ void init_KAIN_config(KAIN_tunedata* KAIN)
 {
     KAIN->kainFile[0] = '\0';
     KAIN->wipe_chance = -1;
-    KAIN->lorePerParticle;
-    KAIN->get_up_presses; // Stored as float per requirement
-    KAIN->vampireWeaponMultiplier;
-    KAIN->maxLoreLevels; // Stored as float per requirement
+    KAIN->lorePerParticle = -1;
+    KAIN->get_up_presses = -1; // Stored as float per requirement
+    KAIN->vampireWeaponMultiplier = -1;
+    KAIN->maxLoreLevels = -1; // Stored as float per requirement
     for (int i = 0; i < KAIN_MAX_LEVELS; i++)
     {
         KAIN->levels[i].hp = -1;
@@ -546,7 +548,6 @@ void init_KAIN_config(KAIN_tunedata* KAIN)
         KAIN->weapons[i].lastberserk_damage = -1;
         KAIN->weapons[i].grab_throw_damage = -1; // Only used by hands
     }
-    KainWeaponData weapons[KAIN_MAX_WEAPONS];
 }
 
 bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) {
@@ -567,7 +568,7 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
             for (int j = 0; j < section->key_count; j++)
             {
                 const KeyValue* kv = &section->keys[j];
-                trim_leading_spaces(kv->value);
+                trim_leading_spaces((char*)kv->value);
 
                 if (strcmp(kv->key, "kainFile") == 0)
                 {
@@ -640,10 +641,11 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                 else if (strncmp(kv->key, "lsword_", 7) == 0)
                 {
                     char attack[20];
-                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    if (sscanf(kv->key + 7, "%s", attack) == 1 )
                     {
                         int cur_weapon = KAINWEAPON_LSWORD;
                         if (strcmp(attack, "1stattack_damage") == 0) {
+                            printf("\nLword %f\n", atof(kv->value));
                             KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
                         } else if (strcmp(attack, "2ndattack_damage") == 0) {
                             KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);
@@ -670,7 +672,7 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                 } else if (strncmp(kv->key, "dagger_", 7) == 0)
                 {
                     char attack[20];
-                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    if (sscanf(kv->key + 7, "%s", attack) == 1 )
                     {
                         int cur_weapon = KAINWEAPON_DAGGER;
                         if (strcmp(attack, "1stattack_damage") == 0) {
@@ -700,7 +702,7 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                 } else if (strncmp(kv->key, "handax_", 7) == 0)
                 {
                     char attack[20];
-                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    if (sscanf(kv->key + 7, "%s", attack) == 1 )
                     {
                         int cur_weapon = KAINWEAPON_HANDAX;
                         if (strcmp(attack, "1stattack_damage") == 0) {
@@ -730,7 +732,7 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                 } else if (strncmp(kv->key, "crossbow_", 9) == 0)
                 {
                     char attack[20];
-                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    if (sscanf(kv->key + 9, "%s", attack) == 1 )
                     {
                         int cur_weapon = KAINWEAPON_CROSSBOW;
                         if (strcmp(attack, "1stattack_damage") == 0) {
@@ -760,7 +762,7 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                 } else if (strncmp(kv->key, "polearm_", 8) == 0)
                 {
                     char attack[20];
-                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    if (sscanf(kv->key + 8, "%s", attack) == 1 )
                     {
                         int cur_weapon = KAINWEAPON_POLEARM;
                         if (strcmp(attack, "1stattack_damage") == 0) {
@@ -790,7 +792,7 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                 } else if (strncmp(kv->key, "hsword_", 7) == 0)
                 {
                     char attack[20];
-                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    if (sscanf(kv->key + 7, "%s", attack) == 1 )
                     {
                         int cur_weapon = KAINWEAPON_HSWORD;
                         if (strcmp(attack, "1stattack_damage") == 0) {
@@ -820,7 +822,7 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                 } else if (strncmp(kv->key, "club_", 5) == 0)
                 {
                     char attack[20];
-                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    if (sscanf(kv->key + 5, "%s", attack) == 1 )
                     {
                         int cur_weapon = KAINWEAPON_CLUB;
                         if (strcmp(attack, "1stattack_damage") == 0) {
@@ -850,7 +852,7 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                 } else if (strncmp(kv->key, "mace_", 5) == 0)
                 {
                     char attack[20];
-                    if (sscanf(kv->key + 6, "%s", attack) == 1 )
+                    if (sscanf(kv->key + 5, "%s", attack) == 1 )
                     {
                         int cur_weapon = KAINWEAPON_MACE;
                         if (strcmp(attack, "1stattack_damage") == 0) {

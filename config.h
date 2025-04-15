@@ -116,8 +116,15 @@ typedef struct {
 //CHEST_tunedata defaultCHEST;
 
 //Prototypes
+void init_config(Config* config);
+void free_config(Config* config);
 void print_config(const Config* config);
-void parse_ini(const char* filename, Config* config);
+int parse_ini(const char* filename, Config* config);
+
+void init_KAIN_config(KAIN_tunedata* KAIN);
+void init_NPC_config(NPC_tunedata* NPC);
+void init_WEAPON_config(WEAPON_tunedata* WEAPON);
+void init_CHEST_config(CHEST_tunedata* CHEST);
 bool get_config_NPC(Config* config, NPC_tunedata* NPC, const char* npcName, const char* levelName);
 bool get_config_WEAPON(Config* config, WEAPON_tunedata* WEAPON, const char* weaponName, const char* levelName);
 bool get_config_CHEST(Config* config, CHEST_tunedata* CHEST, const char* chestName, const char* levelName);
