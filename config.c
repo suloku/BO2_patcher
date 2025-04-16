@@ -441,7 +441,7 @@ void init_EXTRA_config(EXTRA_config* EXTRA_CFG)
 void get_config_EXTRA(Config* config, EXTRA_config* EXTRA_CFG) {
 
     //Initialize with values we can detect
-    init_EXTRA_config(&EXTRA_CFG);
+    init_EXTRA_config(EXTRA_CFG);
 
     for (int i = 0; i < config->section_count; i++)
     {
@@ -449,6 +449,7 @@ void get_config_EXTRA(Config* config, EXTRA_config* EXTRA_CFG) {
         //printf("Section: [%s]\n", section->name);
         if (strcmp(section->name, "EXTRA") == 0)
         {
+
             for (int j = 0; j < section->key_count; j++)
             {
                 const KeyValue* kv = &section->keys[j];
@@ -457,7 +458,9 @@ void get_config_EXTRA(Config* config, EXTRA_config* EXTRA_CFG) {
                 if (strcmp(kv->key, "proportionalBSR") == 0)
                 {
                     if (strcmp(kv->value, "true") == 0)
+                    {
                         EXTRA_CFG->proportionalBloodSuck = true;
+                    }
                 }
                 else if (strcmp(kv->key, "pBSR_0_50") == 0)
                 {
@@ -487,6 +490,8 @@ void get_config_EXTRA(Config* config, EXTRA_config* EXTRA_CFG) {
                 }
             }//For loop end
 
+            //Found EXTRA section and processed it
+            break;
         }//Section check end
 
     }//Section loop end

@@ -670,13 +670,14 @@ skipKain:
         //these two chained prisoners are mandatory to be sucked to get
         //6 lore and level up to level 1 as part of the tutorial.
         //Since we don't need to change any file inside sl02.big, skip it.
-
-        //TODO add some checks in this file to allow customization.
+        /*
+        //This is commented as now we rely on propper settings in the configuration file
         if (strcmp(get_filename(filename), "sl02.big")==0)
         {
             printf("\tSkipping file '%s' (no changes needed).\n", get_filename(filename));
             continue;
         }
+        */
 
         printf("\nOpening file %s\n", filename);
         if (file_exists(filename)) {
@@ -738,7 +739,7 @@ skipKain:
                     levelFilenameNoExtension = remove_extension(get_filename(filename));
                     get_config_CHEST(&config, &tempCHESTconfig, "coll_lore", levelFilenameNoExtension);
 
-                    printf("\t\t%s.tunedata. Applying config...\n", current->data.fileName);
+                    printf("\n\t\t%s.tunedata. Applying config...\n", current->data.fileName);
 
                     //Change collectible lore
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
@@ -746,17 +747,17 @@ skipKain:
                     {
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempCHESTconfig.lore, sizeof(tempCHESTconfig.lore)) == 0)
                         {
-                            printf("\t\t\tRed Chest lore: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempCHESTconfig.lore);
+                            printf("\t\t\tRed Chest lore:\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempCHESTconfig.lore);
                         } else
                         {
-                            printf("\t\t\tRed Chest lore: Failed to replace.\n");
+                            printf("\t\t\tRed Chest lore:\tFailed to replace.\n");
                         }
                     }
                     else
                     {
                         float temp = 0;
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                        printf("\t\t\tRed Chest lore:  keeping value in file (no setting found) %06.2f.\n", temp);
+                        printf("\t\t\tRed Chest lore:\tkeeping value in file (no setting found) %06.2f.\n", temp);
                     }
 
                     //Go to next file
@@ -772,7 +773,7 @@ skipKain:
                     levelFilenameNoExtension = remove_extension(get_filename(filename));
                     get_config_CHEST(&config, &tempCHESTconfig, "coll_biglore", levelFilenameNoExtension);
 
-                    printf("\t\t%s.tunedata. Applying config...\n", current->data.fileName);
+                    printf("\n\t\t%s.tunedata. Applying config...\n", current->data.fileName);
 
                     //Change collectible lore
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
@@ -780,17 +781,17 @@ skipKain:
                     {
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempCHESTconfig.lore, sizeof(tempCHESTconfig.lore)) == 0)
                         {
-                            printf("\t\t\tBlue Chest lore: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempCHESTconfig.lore);
+                            printf("\t\t\tBlue Chest lore:\treplaced at offset 0x%lX to %06.2f\n", replace_offset, tempCHESTconfig.lore);
                         } else
                         {
-                            printf("\t\t\tBlue Chest lore: Failed to replace.\n");
+                            printf("\t\t\tBlue Chest lore:\tFailed to replace.\n");
                         }
                     }
                     else
                     {
                         float temp = 0;
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                        printf("\t\t\tBlue Chest lore:  keeping value in file (no setting found) %06.2f.\n", temp);
+                        printf("\t\t\tBlue Chest lore:\tkeeping value in file (no setting found) %06.2f.\n", temp);
                     }
 
                     //Go to next file
@@ -812,7 +813,7 @@ skipKain:
                         levelFilenameNoExtension = remove_extension(get_filename(filename));
                         get_config_NPC(&config, &tempNPCconfig, current->data.fileName, levelFilenameNoExtension);
 
-                        printf("\t\t%s.tunedata. Applying config...\n", current->data.fileName);
+                        printf("\n\t\t%s.tunedata. Applying config...\n", current->data.fileName);
 
                         //NPCs hitpoints
                         replace_offset = current->data.fileOffset+npc_HitPoints_offset;
@@ -820,17 +821,17 @@ skipKain:
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempNPCconfig.HitPoints, sizeof(tempNPCconfig.HitPoints)) == 0)
                             {
-                                printf("\t\t\tHP: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempNPCconfig.HitPoints);
+                                printf("\t\t\tHP:\t\t replaced at offset 0x%lX to %06.2f\n", replace_offset, tempNPCconfig.HitPoints);
                             } else
                             {
-                                printf("\t\t\tHP: Failed to replace.\n");
+                                printf("\t\t\tHP:\t\t Failed to replace.\n");
                             }
                         }
                         else
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tHP:  keeping value in file (no setting found) %06.2f.\n", temp);
+                            printf("\t\t\tHP:\t\t keeping value in file (no setting found) %06.2f.\n", temp);
                         }
 
                     //Replace Crawl Hitpoints
@@ -839,17 +840,17 @@ skipKain:
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempNPCconfig.CrawlHitPoints, sizeof(tempNPCconfig.CrawlHitPoints)) == 0)
                             {
-                                printf("\t\t\tCrawling HP: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempNPCconfig.CrawlHitPoints);
+                                printf("\t\t\tCrawling HP:\t replaced at offset 0x%lX to %06.2f\n", replace_offset, tempNPCconfig.CrawlHitPoints);
                             } else
                             {
-                                printf("\t\t\tCrawling HP: Failed to replace.\n");
+                                printf("\t\t\tCrawling HP:\t Failed to replace.\n");
                             }
                         }
                         else
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tCrawling HP:  keeping value in file (no setting found) %06.2f.\n", temp);
+                            printf("\t\t\tCrawling HP:\t keeping value in file (no setting found) %06.2f.\n", temp);
                         }
 
                     //Replace Max Blood
@@ -858,17 +859,17 @@ skipKain:
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempNPCconfig.normalMaxBlood, sizeof(tempNPCconfig.normalMaxBlood)) == 0)
                             {
-                                printf("\t\t\tBlood: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempNPCconfig.normalMaxBlood);
+                                printf("\t\t\tBlood:\t\t replaced at offset 0x%lX to %06.2f\n", replace_offset, tempNPCconfig.normalMaxBlood);
                             } else
                             {
-                                printf("\t\t\ttBlood: Failed to replace.\n");
+                                printf("\t\t\tBlood:\t\t Failed to replace.\n");
                             }
                         }
                         else
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tBlood:  keeping value in file (no setting found) %06.2f.\n", temp);
+                            printf("\t\t\tBlood:\t\t keeping value in file (no setting found) %06.2f.\n", temp);
                         }
 
                     //Replace Max Stealth Blood
@@ -877,17 +878,17 @@ skipKain:
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempNPCconfig.stealtKillMaxBlood, sizeof(tempNPCconfig.stealtKillMaxBlood)) == 0)
                             {
-                                printf("\t\t\tStealth Blood: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempNPCconfig.stealtKillMaxBlood);
+                                printf("\t\t\tStealth Blood:\t replaced at offset 0x%lX to %06.2f\n", replace_offset, tempNPCconfig.stealtKillMaxBlood);
                             } else
                             {
-                                printf("\t\t\tStealth Blood: Failed to replace.\n");
+                                printf("\t\t\tStealth Blood:\t Failed to replace.\n");
                             }
                         }
                         else
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tStealth Blood:  keeping value in file (no setting found) %06.2f.\n", temp);
+                            printf("\t\t\tStealth Blood:\t keeping value in file (no setting found) %06.2f.\n", temp);
                         }
 
                     //Replace Bloodsuck Rate
@@ -914,7 +915,7 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tBlood Suck Rate:  keeping value in file (no setting found) %06.2f.\n", temp);
+                            printf("\t\t\tBlood Suck Rate: keeping value in file (no setting found) %06.2f.\n", temp);
                         }
                         else //We have to replace the blood suck rate
                         {
@@ -939,17 +940,17 @@ skipKain:
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempNPCconfig.maxLore, sizeof(tempNPCconfig.maxLore)) == 0)
                             {
-                                printf("\t\t\tLore: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempNPCconfig.maxLore);
+                                printf("\t\t\tLore:\t\t replaced at offset 0x%lX to %06.2f\n", replace_offset, tempNPCconfig.maxLore);
                             } else
                             {
-                                printf("\t\t\tLore: Failed to replace.\n");
+                                printf("\t\t\tLore:\t\t Failed to replace.\n");
                             }
                         }
                         else
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tLore:  keeping value in file (no setting found) %06.2f.\n", temp);
+                            printf("\t\t\tLore:\t\t keeping value in file (no setting found) %06.2f.\n", temp);
                         }
 
                         break;//test next file
@@ -962,25 +963,52 @@ skipKain:
                     //If we find an npc file, make the modifications and skip to next file
                     if (strcmp(current->data.fileName, dropWeaponFilesToModNames[x])==0)
                     {
-                        printf("\t\t%s.tunedata\n", dropWeaponFilesToModNames[x]);
+                        //We found a weapon .tunedata file. Load the config for this weapon and level if it exists
+                        //note: missing values will be loaded from the "default" entry if found
+                        if (levelFilenameNoExtension) free (levelFilenameNoExtension);
+                        levelFilenameNoExtension = remove_extension(get_filename(filename));
+                        get_config_WEAPON(&config, &tempWEAPONconfig, current->data.fileName, levelFilenameNoExtension);
+
+                        printf("\n\t\t%s.tunedata. Applying config...\n", current->data.fileName);
 
                         //Update weapon parameters
                         //Change weapon's HP
                         replace_offset = current->data.fileOffset+weaponTune_weaponHP_offset;
-                        float test = 0;
-                        read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&test);
-                        //Print this Weapon's HP
-#ifdef DATA_DUMP_MESSAGES
-                        printf("\t\t\t%s.tunedata's weapon HP: %06.2f\n", current->data.fileName, test);
-#endif
-                        if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&new_npc_lore, sizeof(new_npc_lore)) == 0) {
-                            printf("\t\t\t%s.tunedata's weapon HP successfully replaced at offset 0x%lX to %06.2f\n", current->data.fileName, replace_offset, new_npc_lore);
-                        } else {
-                            printf("\t\t\tFailed to replace %s.tunedata's weapon HP.\n", current->data.fileName);
+                        if (tempWEAPONconfig.HP != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempWEAPONconfig.HP, sizeof(tempWEAPONconfig.HP)) == 0)
+                            {
+                                printf("\t\t\tHP:\t\t replaced at offset 0x%lX to %06.2f\n", replace_offset, tempWEAPONconfig.HP);
+                            } else
+                            {
+                                printf("\t\t\tHP:\t\t Failed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\tHP:\t\t keeping value in file (no setting found) %06.2f.\n", temp);
                         }
 
                         //Change number of grab loops
-                        int32_t weaponTune_GrabLoopTimes = 0x40;
+                        replace_offset = current->data.fileOffset+weaponTune_GrabLoopTimes_offset;
+                        if (tempWEAPONconfig.HP != -1)
+                        {
+                            if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempWEAPONconfig.grabLoops, sizeof(tempWEAPONconfig.grabLoops)) == 0)
+                            {
+                                printf("\t\t\tGrab attack #:\t replaced at offset 0x%lX to %02d\n", replace_offset, tempWEAPONconfig.grabLoops);
+                            } else
+                            {
+                                printf("\t\t\tGrab attack #:\t Failed to replace.\n");
+                            }
+                        }
+                        else
+                        {
+                            int32_t temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            printf("\t\t\tGrab attack #:\t keeping value in file (no setting found) %02d.\n", temp);
+                        }
                     }
                     break;//test next file
                 }

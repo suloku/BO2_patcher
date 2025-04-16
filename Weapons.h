@@ -281,8 +281,8 @@ int soulreaver_lastspeedattack_offset  = 0x16b8;
 
 //Offsets for each weapon tunedata values
 int weaponTune_weaponClass_offset = 0x04;
-float weaponTune_weaponHP_offset = 0x08;
-int32_t weaponTune_GrabLoopTimes = 0x40;
+int weaponTune_weaponHP_offset = 0x08;
+int weaponTune_GrabLoopTimes_offset = 0x40;
 
 const char *kainWeaponFilesToModNames[] = {
     "hands", //Claws
