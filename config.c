@@ -425,6 +425,75 @@ bool get_config_WEAPON(Config* config, WEAPON_tunedata* WEAPON, const char* weap
     return found;
 }
 
+// Function to initialize additional configuration file data.
+// In this case there are some default values
+void init_EXTRA_config(EXTRA_config* EXTRA_CFG)
+{
+    EXTRA_CFG->proportionalBloodSuck = false;
+    EXTRA_CFG->npc_bloodsuckratio_0_50 = 1.0;
+    EXTRA_CFG->npc_bloodsuckratio_51_75 = 1.25;
+    EXTRA_CFG->npc_bloodsuckratio_76_125 = 1.5;
+    EXTRA_CFG->npc_bloodsuckratio_126_150 = 1.75;
+    EXTRA_CFG->npc_bloodsuckratio_151plus = 2.0;
+}
+
+//If there is no config data found, this will become the default configuration, so no need to return anything
+void get_config_EXTRA(Config* config, EXTRA_config* EXTRA_CFG) {
+
+    //Initialize with values we can detect
+    init_EXTRA_config(&EXTRA_CFG);
+
+    for (int i = 0; i < config->section_count; i++)
+    {
+        const Section* section = &config->sections[i];
+        //printf("Section: [%s]\n", section->name);
+        if (strcmp(section->name, "EXTRA") == 0)
+        {
+            for (int j = 0; j < section->key_count; j++)
+            {
+                const KeyValue* kv = &section->keys[j];
+                trim_leading_spaces((char*)kv->value);
+
+                if (strcmp(kv->key, "proportionalBSR") == 0)
+                {
+                    if (strcmp(kv->value, "true") == 0)
+                        EXTRA_CFG->proportionalBloodSuck = true;
+                }
+                else if (strcmp(kv->key, "pBSR_0_50") == 0)
+                {
+                    EXTRA_CFG->npc_bloodsuckratio_0_50 = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "pBSR_51_75") == 0)
+                {
+                    EXTRA_CFG->npc_bloodsuckratio_51_75 = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "pBSR_76_125") == 0)
+                {
+                    EXTRA_CFG->npc_bloodsuckratio_76_125 = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "pBSR_126_150") == 0)
+                {
+                    EXTRA_CFG->npc_bloodsuckratio_126_150 = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "pBSR_151_plus") == 0)
+                {
+                    EXTRA_CFG->npc_bloodsuckratio_151plus = atof(kv->value);
+                }
+                else //Unrecognized key
+                {
+                    printf("\n\tUnrecognized key in config file:\n\t\t[%s] %s = %s\n\n", section->name, kv->key, kv->value);
+                    printf("Can't proceed. Correct the configuration file and try again.");
+                    exit(0);
+                }
+            }//For loop end
+
+        }//Section check end
+
+    }//Section loop end
+
+    return;
+}
+
 // Function to initialize CHEST data.
 // -1/NULL is used to identify a missing config, thus use the default config
 // If the default config is being used, -1/NULL is used to not make any changes to the files

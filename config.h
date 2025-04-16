@@ -108,6 +108,15 @@ typedef struct {
     char levels[MAX_LEVEL_ARRAY];  // Array of strings (level names). 1024 should be enough chars even if all level names are written.
 }CHEST_tunedata;
 
+typedef struct {
+    bool proportionalBloodSuck;
+    float npc_bloodsuckratio_0_50;
+    float npc_bloodsuckratio_51_75;
+    float npc_bloodsuckratio_76_125;
+    float npc_bloodsuckratio_126_150;
+    float npc_bloodsuckratio_151plus;
+}EXTRA_config;
+
 //Variables
 
 //KAIN_tunedata defaultKAIN;
@@ -121,11 +130,14 @@ void free_config(Config* config);
 void print_config(const Config* config);
 int parse_ini(const char* filename, Config* config);
 
+void init_EXTRA_config(EXTRA_config* EXTRA_CFG);
 void init_KAIN_config(KAIN_tunedata* KAIN);
 void init_NPC_config(NPC_tunedata* NPC);
 void init_WEAPON_config(WEAPON_tunedata* WEAPON);
 void init_CHEST_config(CHEST_tunedata* CHEST);
+
 bool get_config_NPC(Config* config, NPC_tunedata* NPC, const char* npcName, const char* levelName);
 bool get_config_WEAPON(Config* config, WEAPON_tunedata* WEAPON, const char* weaponName, const char* levelName);
 bool get_config_CHEST(Config* config, CHEST_tunedata* CHEST, const char* chestName, const char* levelName);
 bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile);
+void get_config_EXTRA(Config* config, EXTRA_config* EXTRA_CFG);

@@ -16,7 +16,8 @@ float new_npc_crawl_hitpoints = 5;
 float npc_bloodsukratio_0_50 = 1.0;
 float npc_bloodsukratio_51_75 = 1.25;
 float npc_bloodsukratio_76_125 = 1.5;
-float npc_bloodsukratio_126plus = 1.75;
+float npc_bloodsukratio_126_150 = 1.75;
+float npc_bloodsukratio_151plus = 2.0;
 
 //kainX.tunedata
 float wipe_chance = 5;
