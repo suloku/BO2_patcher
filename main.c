@@ -6,6 +6,7 @@
 #include <float.h>
 #include <math.h>
 #include <time.h>
+#include <dirent.h>
 
 #include "kain.h"
 #include "BO2BigFile.h"
@@ -19,6 +20,14 @@
 
 #include "config.h"
 
+#define MAX_FILES 100
+#define MAX_FILENAME PATH_MAX
+
+char runPath [PATH_MAX];
+char filename [PATH_MAX];
+char csvFilePath [PATH_MAX];
+char configFilePath [PATH_MAX];
+
 //#define DATA_DUMP_MESSAGES
 //#define OUTPUT_TUNEDATA_FILES
 
@@ -28,7 +37,15 @@ char *levelFilenameNoExtension;
 
 #define DUMP_MODE 0
 #define PATCH_MODE 1
-int program_mode = DUMP_MODE;
+
+bool dumpDataCSV = true;
+FILE *KainCsvFileptr;
+FILE *npcCsvFileptr;
+FILE *weaponCsvFileptr;
+FILE *chestCsvFileptr;
+#define CSV_FILE "bo2tuner_dump.csv"
+
+int program_mode = PATCH_MODE;
 
 void my_exit();
 
@@ -41,10 +58,131 @@ int get_kain_level_hp_offset(int level)
     return kain_levels_offset + (level*4*2) + 4;
 }
 
+void clearScreen()
+{
+#ifdef _WIN32
+        system("cls"); // Windows
+    #else
+        system("clear"); // Linux/Unix
+    #endif
+    return;
+}
+
+void displayMenu_1() {
+
+    printf("::::::::::::::::::::::::::::::::::::::::\n");
+    printf(": Blood Omen 2 Tuner v0.2              :\n");
+    printf(":                          suloku 2025 :\n");
+    printf("::::::::::::::::::::::::::::::::::::::::\n\n");
+
+    printf("===== Menu =====\n");
+    printf("1. Patch Mode\n");
+    printf("2. Data Dump Mode\n");
+    printf("3. Exit\n");
+    printf("\nEnter your choice (1-3): ");
+}
+
+void displayMenu_2(char files[][MAX_FILENAME], int count) {
+
+    printf("::::::::::::::::::::::::::::::::::::::::\n");
+    printf(": Blood Omen 2 Tuner v0.2              :\n");
+    printf(":                          suloku 2025 :\n");
+    printf("::::::::::::::::::::::::::::::::::::::::\n\n");
+
+    printf("===== Select .ini File =====\n");
+    if (count == 0) {
+        printf("\nNo .ini files found in bo2tuner_cfg directory.\n");
+        return;
+    }
+
+    for (int i = 0; i < count; i++) {
+        printf("%d. %s\n", i + 1, files[i]);
+    }
+    printf("%d. Exit\n", count + 1);
+    printf("\nEnter your choice (1-%d): ", count + 1);
+}
+
+int get_valid_input(int max_choice) {
+    int choice;
+    char buffer[100];
+
+    while (1) {
+        if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
+            if (sscanf(buffer, "%d", &choice) == 1 && choice >= 1 && choice <= max_choice) {
+                return choice;
+            }
+        }
+        printf("Invalid input. Please enter a number between 1 and %d: ", max_choice);
+    }
+}
+
+int list_ini_files(char files[][MAX_FILENAME], const char *dir_path) {
+    DIR *dir;
+    struct dirent *entry;
+    int count = 0;
+
+    dir = opendir(dir_path);
+    if (dir == NULL) {
+        printf("Error: Could not open directory '%s'\n", dir_path);
+        return 0;
+    }
+
+    while ((entry = readdir(dir)) != NULL && count < MAX_FILES) {
+        // Check if the file ends with .ini
+        if (strstr(entry->d_name, ".ini") != NULL) {
+            strncpy(files[count], entry->d_name, MAX_FILENAME - 1);
+            files[count][MAX_FILENAME - 1] = '\0';
+            count++;
+        }
+    }
+
+    closedir(dir);
+    return count;
+}
+
+
+
+int select_ini_file(char *selected_file) {
+    char files[MAX_FILES][MAX_FILENAME];
+    char dir_path[MAX_FILENAME];
+    int file_count;
+
+    append_directory(runPath, "bo2tuner_cfg", dir_path, sizeof(dir_path));
+
+    // List .ini files
+    file_count = list_ini_files(files, dir_path);
+
+    while (1) {
+        clearScreen();
+        displayMenu_2(files, file_count);
+
+        if (file_count == 0) {
+            printf("\nPress Enter to exit...");
+            getchar();
+            return 0; // No files found
+        }
+
+        int choice = get_valid_input(file_count + 1);
+
+        clearScreen();
+
+        if (choice == file_count + 1) {
+            //printf("Exiting selection. No file selected.\n");
+            return 0; // User chose to exit
+        }
+
+        // Store the selected filename
+        strncpy(selected_file, files[choice - 1], MAX_FILENAME - 1);
+        selected_file[MAX_FILENAME - 1] = '\0';
+        printf("Selected file: %s\n", selected_file);
+        return 1; // Successful selection
+    }
+}
+
 int main(int argc, char *argv[]) {
 
     printf("::::::::::::::::::::::::::::::::::::::::\n");
-    printf(": Blood Omen 2 Patcher v0.2            :\n");
+    printf(": Blood Omen 2 Tuner v0.2              :\n");
     printf(":                          suloku 2025 :\n");
     printf("::::::::::::::::::::::::::::::::::::::::\n\n");
 
@@ -55,8 +193,6 @@ int main(int argc, char *argv[]) {
         printf("Could not determine path.\n");
     }
 
-    char runPath [PATH_MAX];
-    char filename [PATH_MAX];
     strcpy (runPath, argv[0]);
 
     char *pos = strrchr(runPath, get_path_separator());
@@ -66,12 +202,107 @@ int main(int argc, char *argv[]) {
     }
     printf ("RunPath: %s\n", runPath);
 
+/*
+    MENU 1
+*/
+    int choice = 0;
+    while (1) {
+        clearScreen();
+        displayMenu_1();
+        choice = get_valid_input(3);
+
+        clearScreen();
+
+        switch (choice) {
+            case 1:
+                printf("Patch Mode selected.\n");
+                program_mode = PATCH_MODE;
+                break;
+            case 2:
+                printf("Dump Mode selected.\n");
+                program_mode = DUMP_MODE;
+                break;
+            case 3:
+                printf("Exiting program. Goodbye!\n");
+                my_exit();
+        }
+
+        //printf("\nPress Enter to continue...");
+        //getchar(); // Wait for user to press Enter
+
+        if (choice) break;
+    }
+
+/*
+    MENU 2
+*/
+    char selected_file[MAX_FILENAME] = {0};
+    if (program_mode == PATCH_MODE)
+    {
+        if (select_ini_file(selected_file)) {
+            printf("Tunning BO2 with %s\n", selected_file);
+        } else {
+            printf("No file was selected.\n");
+            my_exit();
+        }
+    }
+
+    clearScreen();
+    printf("::::::::::::::::::::::::::::::::::::::::\n");
+    printf(": Blood Omen 2 Tuner v0.2              :\n");
+    printf(":                          suloku 2025 :\n");
+    printf("::::::::::::::::::::::::::::::::::::::::\n\n");
+
+    //Open csv file for data dump
+    if (dumpDataCSV && program_mode == DUMP_MODE)
+    {
+        append_directory(runPath, "dump_kaindata.csv", csvFilePath, sizeof(csvFilePath));
+        KainCsvFileptr = fopen(csvFilePath, "w");
+        if (KainCsvFileptr == NULL)
+        {
+            printf("Could not open %s", csvFilePath);
+            my_exit();
+        }
+        append_directory(runPath, "dump_chestdata.csv", csvFilePath, sizeof(csvFilePath));
+        chestCsvFileptr = fopen(csvFilePath, "w");
+        if (chestCsvFileptr == NULL)
+        {
+            printf("Could not open %s", csvFilePath);
+            my_exit();
+        }
+        append_directory(runPath, "dump_npcdata.csv", csvFilePath, sizeof(csvFilePath));
+        npcCsvFileptr = fopen(csvFilePath, "w");
+        if (npcCsvFileptr == NULL)
+        {
+            printf("Could not open %s", csvFilePath);
+            my_exit();
+        }
+        append_directory(runPath, "dump_weapondata.csv", csvFilePath, sizeof(csvFilePath));
+        weaponCsvFileptr = fopen(csvFilePath, "w");
+        if (weaponCsvFileptr == NULL)
+        {
+            printf("Could not open %s", csvFilePath);
+            my_exit();
+        }
+    }
+
+    if (program_mode == PATCH_MODE)
+    {
+        printf("Tunning BO2 with %s\n", selected_file);
+        printf("\n   Press enter to start patching...");
+        getchar();
+    }
+
     //Load configuration file
-    append_directory(runPath, "config.ini", filename, sizeof(filename));
     init_config(&config);
     if (program_mode == PATCH_MODE)
     {
-        if (parse_ini(filename, &config) == -1)
+        append_directory(runPath, "bo2tuner_cfg", configFilePath, sizeof(configFilePath));
+        append_directory(configFilePath, selected_file, configFilePath, sizeof(configFilePath));
+        printf("Loading %s\n", configFilePath);
+        //getchar();
+
+        if (parse_ini(configFilePath, &config) == -1)
         {
             my_exit();
         }
@@ -175,6 +406,11 @@ int main(int argc, char *argv[]) {
     //Comment to skip kain*.big files for debugging
     //goto skipKain;
 
+    if (dumpDataCSV && program_mode == DUMP_MODE)
+    {
+        fprintf(KainCsvFileptr, "File;Wipe Chance;Lore Particles;Get Up Presses;Vampire Weapon Multiplier;MaxLoreLevels;Lvl_00_Lore;Lvl_00_HP;Lvl_01_Lore;Lvl_01_HP;Lvl_02_Lore;Lvl_02_HP;Lvl_03_Lore;Lvl_03_HP;Lvl_04_Lore;Lvl_04_HP;Lvl_05_Lore;Lvl_05_HP;Lvl_06_Lore;Lvl_06_HP;Lvl_07_Lore;Lvl_07_HP;Lvl_08_Lore;Lvl_08_HP;Lvl_09_Lore;Lvl_09_HP;Lvl_10_Lore;Lvl_10_HP;Lvl_11_Lore;Lvl_11_HP;Lvl_12_Lore;Lvl_12_HP;Lvl_13_Lore;Lvl_13_HP;Lvl_14_Lore;Lvl_14_HP;Lvl_15_Lore;Lvl_15_HP;Lvl_16_Lore;Lvl_16_HP;Lvl_17_Lore;Lvl_17_HP;Lvl_18_Lore;Lvl_18_HP;Lvl_19_Lore;Lvl_19_HP;Lvl_20_Lore;Lvl_20_HP;Lvl_21_Lore;Lvl_21_HP;Lvl_22_Lore;Lvl_22_HP;Lvl_23_Lore;Lvl_23_HP;Lvl_24_Lore;Lvl_24_HP;Lvl_25_Lore;Lvl_25_HP;Claws 1st Attack;Claws 2nd Attack;Claws 3rd Attack;Claws Ground Attack;Claws Grab Loop;Claws Grab Final;Claws Grab Throw;Claws Fury Attack;Claws Jump Attack;Claws Berserk Attack;Claws Last Berserk Attack;Long Swords 1st Attack;Long Swords 2nd Attack;Long Swords 3rd Attack;Long Swords Ground Attack;Long Swords Grab Loop;Long Swords Grab Final;Long Swords Grab Throw;Long Swords Fury Attack;Long Swords Jump Attack;Long Swords Berserk Attack;Long Swords Last Berserk Attack;Daggers 1st Attack;Daggers 2nd Attack;Daggers 3rd Attack;Daggers Ground Attack;Daggers Grab Loop;Daggers Grab Final;Daggers Grab Throw;Daggers Fury Attack;Daggers Jump Attack;Daggers Berserk Attack;Daggers Last Berserk Attack;Short Axes 1st Attack;Short Axes 2nd Attack;Short Axes 3rd Attack;Short Axes Ground Attack;Short Axes Grab Loop;Short Axes Grab Final;Short Axes Grab Throw;Short Axes Fury Attack;Short Axes Jump Attack;Short Axes Berserk Attack;Short Axes Last Berserk Attack;Crossbow 1st Attack;Crossbow 2nd Attack;Crossbow 3rd Attack;Crossbow Ground Attack;Crossbow Grab Loop;Crossbow Grab Final;Crossbow Grab Throw;Crossbow Fury Attack;Crossbow Jump Attack;Crossbow Berserk Attack;Crossbow Last Berserk Attack;Double-Bladed Sword 1st Attack;Double-Bladed Sword 2nd Attack;Double-Bladed Sword 3rd Attack;Double-Bladed Sword Ground Attack;Double-Bladed Sword Grab Loop;Double-Bladed Sword Grab Final;Double-Bladed Sword Grab Throw;Double-Bladed Sword Fury Attack;Double-Bladed Sword Jump Attack;Double-Bladed Sword Berserk Attack;Double-Bladed Sword Last Berserk Attack;Broadsword/Long Axe 1st Attack;Broadsword/Long Axe 2nd Attack;Broadsword/Long Axe 3rd Attack;Broadsword/Long Axe Ground Attack;Broadsword/Long Axe Grab Loop;Broadsword/Long Axe Grab Final;Broadsword/Long Axe Grab Throw;Broadsword/Long Axe Fury Attack;Broadsword/Long Axe Jump Attack;Broadsword/Long Axe Berserk Attack;Broadsword/Long Axe Last Berserk Attack;Spiked Club/Scepter 1st Attack;Spiked Club/Scepter 2nd Attack;Spiked Club/Scepter 3rd Attack;Spiked Club/Scepter Ground Attack;Spiked Club/Scepter Grab Loop;Spiked Club/Scepter Grab Final;Spiked Club/Scepter Grab Throw;Spiked Club/Scepter Fury Attack;Spiked Club/Scepter Jump Attack;Spiked Club/Scepter Berserk Attack;Spiked Club/Scepter Last Berserk Attack;Mace 1st Attack;Mace 2nd Attack;Mace 3rd Attack;Mace Ground Attack;Mace Grab Loop;Mace Grab Final;Mace Grab Throw;Mace Fury Attack;Mace Jump Attack;Mace Berserk Attack;Mace Last Berserk Attack;Soul Reaver 1st Attack;Soul Reaver 2nd Attack;Soul Reaver 3rd Attack;Soul Reaver Ground Attack;Soul Reaver Grab Loop;Soul Reaver Grab Final;Soul Reaver Grab Throw;Soul Reaver Fury Attack;Soul Reaver Jump Attack;Soul Reaver Berserk Attack;Soul Reaver Last Berserk Attack;");
+    }
+
     for (i=0; i < kainbigfilecount; i++)
     {
         //Clear the entry list
@@ -216,7 +452,11 @@ int main(int argc, char *argv[]) {
                 kainFilenameNoExtension = remove_extension(get_filename(filename));
                 get_config_KAIN(&config, &tempKAINconfig, kainFilenameNoExtension);
 
-                printf("\tFound %s.tunedata. Applying config...\n", current->data.fileName);
+                printf("\tFound %s.tunedata\n", current->data.fileName);
+                if (dumpDataCSV && program_mode == DUMP_MODE)
+                {
+                    fprintf(KainCsvFileptr, "\n%s;", kain_big_files[i]);
+                }
 
                 //Change wipe chance
                 replace_offset = current->data.fileOffset+wipe_chance_offset;
@@ -236,6 +476,7 @@ int main(int argc, char *argv[]) {
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                     if (program_mode == PATCH_MODE) printf("\t\tWipe Chance:  keeping value in file (no setting found) %06.2f\n", temp);
                     else printf("\t\tWipe Chance:\t\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                 }
 
                 //Change Lore Per Particle
@@ -256,6 +497,7 @@ int main(int argc, char *argv[]) {
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                     if (program_mode == PATCH_MODE) printf("\t\tLore particles:  keeping value in file (no setting found) %06.2f\n", temp);
                     else printf("\t\tLore particles:\t\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                 }
 
                 //Change number of button presses for Kain to get up after knockdown
@@ -276,6 +518,7 @@ int main(int argc, char *argv[]) {
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                     if (program_mode == PATCH_MODE) printf("\t\tKnockdown button presses:  keeping value in file (no setting found) %03d\n", temp);
                     else printf("\t\tKnockdown button presses: %03d\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%d;", temp);
                 }
 
                 //Change Vampire Weapon Damage Multiplier
@@ -296,6 +539,7 @@ int main(int argc, char *argv[]) {
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                     if (program_mode == PATCH_MODE) printf("\t\tVampire Weapon Damage Multiplier: keeping value in file (no setting found) %06.2f\n", temp);
                     else printf("\t\tVampire Weapon Damage Multiplier: %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                 }
 
                 //Change Max Lore Levels
@@ -316,6 +560,7 @@ int main(int argc, char *argv[]) {
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                     if (program_mode == PATCH_MODE) printf("\t\tMax Lore Levels: keeping value in file (no setting found) %03d\n", temp);
                     else printf("\t\tMax Lore Levels:\t %03d\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%d;", temp);
                 }
 
                 //Change Kain's level data
@@ -339,6 +584,7 @@ int main(int argc, char *argv[]) {
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                         if (program_mode == PATCH_MODE) printf("\t\t\tKain's Level %d Lore:\tkeeping value in file (no setting found) %06.2f\n", j, temp);
                         else printf("\t\t\tKain's Level %d Lore:\t %06.2f\n", j, temp);
+                        if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                     }
 
 
@@ -360,6 +606,7 @@ int main(int argc, char *argv[]) {
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                         if (program_mode == PATCH_MODE) printf("\t\t\tKain's Level %d HP:\tkeeping value in file (no setting found) %06.2f\n", j, temp);
                         else printf("\t\t\tKain's Level %d HP:\t %06.2f\n", j, temp);
+                        if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                     }
                 }
 
@@ -391,7 +638,12 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\t1st attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\t1st attack damage:\t\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+
                         }
+                    }else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                     //2nd attack
@@ -414,7 +666,11 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\t2nd attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\t2nd attack damage:\t\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
+                    }else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                     //3rd attack
@@ -437,7 +693,11 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\t3rd attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\t3rd attack damage:\t\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
+                    }else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                     //Ground Damage
@@ -460,7 +720,11 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tGround attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tGround attack damage:\t\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
+                    } else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                     //Grab Loop Damage
@@ -483,7 +747,11 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tGrab Loop attack damage:\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tGrab Loop attack damage:\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
+                    } else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                     //Grab Final Damage
@@ -506,7 +774,11 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tGrab Final attack damage:\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tGrab Final attack damage:\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
+                    } else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                     //Grab Throw Damage
@@ -529,7 +801,11 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tGrab Throw attack damage:\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tGrab Throw attack damage:\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
+                    } else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                     //Fury Damage
@@ -552,7 +828,11 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tFury attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tFury attack damage:\t\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
+                    } else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                     //Jump Damage
@@ -575,7 +855,11 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tJump attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tJump attack damage:\t\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
+                    } else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                     //Berserk Damage
@@ -598,7 +882,11 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tBerserk attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tBerserk attack damage:\t\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
+                    } else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                     //Final Berserk Damage
@@ -621,7 +909,11 @@ int main(int argc, char *argv[]) {
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tBerserk final attack damage:\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tBerserk final attack damage:\t%06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
+                    } else if (dumpDataCSV && program_mode == DUMP_MODE)
+                    {
+                        fprintf(KainCsvFileptr, "0;");
                     }
 
                 }//Weapon damage loop end
@@ -681,6 +973,13 @@ int main(int argc, char *argv[]) {
 
 //goto tag
 skipKain:
+
+    if (dumpDataCSV && program_mode == DUMP_MODE)
+    {
+        fprintf(npcCsvFileptr, "NPC;Level;HP;Crawl HP;Blood;Stealth Blood;Bloodsuck Rate;Lore;");
+        fprintf(weaponCsvFileptr, "Weapon;Level;HP;Grab Attack #;");
+        fprintf(chestCsvFileptr, "Chest;Level;Lore;\n");
+    }
 
    //Collectables
    //Scan trough every game level, find the coll_lore.tunedata, coll_biglore.tunedata and coll_weapon.tunedata files and change the lore
@@ -767,7 +1066,7 @@ skipKain:
                     levelFilenameNoExtension = remove_extension(get_filename(filename));
                     get_config_CHEST(&config, &tempCHESTconfig, "coll_lore", levelFilenameNoExtension);
 
-                    printf("\n\t\t%s.tunedata. Applying config...\n", current->data.fileName);
+                    printf("\n\t\t%s.tunedata\n", current->data.fileName);
 
                     //Change collectible lore
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
@@ -787,6 +1086,7 @@ skipKain:
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                         if (program_mode == PATCH_MODE) printf("\t\t\tRed Chest lore:\tkeeping value in file (no setting found) %06.2f\n", temp);
                         else printf("\t\t\tRed Chest lore:\t %06.2f\n", temp);
+                        if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(chestCsvFileptr, "%s;%s;%f;\n", current->data.fileName, levelFilenameNoExtension, temp);
                     }
 
                     //Go to next file
@@ -802,7 +1102,7 @@ skipKain:
                     levelFilenameNoExtension = remove_extension(get_filename(filename));
                     get_config_CHEST(&config, &tempCHESTconfig, "coll_biglore", levelFilenameNoExtension);
 
-                    printf("\n\t\t%s.tunedata. Applying config...\n", current->data.fileName);
+                    printf("\n\t\t%s.tunedata\n", current->data.fileName);
 
                     //Change collectible lore
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
@@ -822,6 +1122,7 @@ skipKain:
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                         if (program_mode == PATCH_MODE) printf("\t\t\tBlue Chest lore:\tkeeping value in file (no setting found) %06.2f\n", temp);
                         else printf("\t\t\tBlue Chest lore:\t %06.2f\n", temp);
+                        if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(chestCsvFileptr, "%s;%s;%f;\n", current->data.fileName, levelFilenameNoExtension, temp);
                     }
 
                     //Go to next file
@@ -843,7 +1144,8 @@ skipKain:
                         levelFilenameNoExtension = remove_extension(get_filename(filename));
                         get_config_NPC(&config, &tempNPCconfig, current->data.fileName, levelFilenameNoExtension);
 
-                        printf("\n\t\t%s.tunedata. Applying config...\n", current->data.fileName);
+                        printf("\n\t\t%s.tunedata\n", current->data.fileName);
+                        if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "\n%s;%s;", current->data.fileName, levelFilenameNoExtension);
 
                         //NPCs hitpoints
                         replace_offset = current->data.fileOffset+npc_HitPoints_offset;
@@ -863,6 +1165,7 @@ skipKain:
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tHP:\t\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tHP:\t\t %06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
 
                     //Replace Crawl Hitpoints
@@ -883,6 +1186,7 @@ skipKain:
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tCrawling HP:\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tCrawling HP:\t %06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
 
                     //Replace Max Blood
@@ -903,6 +1207,7 @@ skipKain:
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tBlood:\t\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tBlood:\t\t %06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
 
                     //Replace Max Stealth Blood
@@ -923,6 +1228,7 @@ skipKain:
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tStealth Blood:\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tStealth Blood:\t %06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
 
                     //Replace Bloodsuck Rate
@@ -950,7 +1256,8 @@ skipKain:
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tBlood Suck Rate: keeping value in file (no setting found) %06.2f\n", temp);
-                            else printf("\t\t\tBlood Suck Rate:\t %06.2f\n", temp);
+                            else printf("\t\t\tBlood Suck Rate: %06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
                         else if ( program_mode == PATCH_MODE) //We have to replace the blood suck rate
                         {
@@ -967,6 +1274,13 @@ skipKain:
                             {
                                 printf("\t\t\tBlood Suck Rate: Failed to replace.\n");
                             }
+                        } else
+                        {
+                            float temp = 0;
+                            read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tBlood Suck Rate: keeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tBlood Suck Rate: %06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
 
                     //Replace Lore
@@ -987,6 +1301,7 @@ skipKain:
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tLore:\t\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tLore:\t\t %06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
 
                         break;//test next file
@@ -996,7 +1311,7 @@ skipKain:
                 //Check for Weapon files inside the bigfile
                 for (x=0;x<dropWeaponFilesToModNamesCount;x++)
                 {
-                    //If we find an npc file, make the modifications and skip to next file
+                    //If we find an weapon file, make the modifications and skip to next file
                     if (strcmp(current->data.fileName, dropWeaponFilesToModNames[x])==0)
                     {
                         //We found a weapon .tunedata file. Load the config for this weapon and level if it exists
@@ -1005,7 +1320,8 @@ skipKain:
                         levelFilenameNoExtension = remove_extension(get_filename(filename));
                         get_config_WEAPON(&config, &tempWEAPONconfig, current->data.fileName, levelFilenameNoExtension);
 
-                        printf("\n\t\t%s.tunedata. Applying config...\n", current->data.fileName);
+                        printf("\n\t\t%s.tunedata\n", current->data.fileName);
+                        if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(weaponCsvFileptr, "\n%s;%s;", current->data.fileName, levelFilenameNoExtension);
 
                         //Update weapon parameters
                         //Change weapon's HP
@@ -1026,6 +1342,7 @@ skipKain:
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tHP:\t\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tHP:\t\t %06.2f\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(weaponCsvFileptr, "%f;", temp);
                         }
 
                         //Change number of grab loops
@@ -1045,10 +1362,10 @@ skipKain:
                             int32_t temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
                             if (program_mode == PATCH_MODE) printf("\t\t\tGrab attack #:\t keeping value in file (no setting found) %02d.\n", temp);
-                            else printf("\t\t\tGrab attack #:\t %03d.\n", temp);
+                            else printf("\t\t\tGrab attack #:\t %03d\n", temp);
+                            if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(weaponCsvFileptr, "%d;", temp);
                         }
                     }
-                    break;//test next file
                 }
 
 /*      //This code prints out all .tunedata files bigger than 3000 bytes (npc files are around 6000 bytes)
@@ -1168,6 +1485,10 @@ skipKain:
 
 void my_exit()
 {
+    if (KainCsvFileptr){ fclose(KainCsvFileptr);}
+    if (npcCsvFileptr){ fclose(npcCsvFileptr);}
+    if (weaponCsvFileptr){ fclose(weaponCsvFileptr);}
+    if (chestCsvFileptr){ fclose(chestCsvFileptr);}
     free_config(&config);
     printf("\nPress a key and then Enter to continue...\n");
     getchar();  // Waits for a character + Enter

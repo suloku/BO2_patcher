@@ -719,7 +719,6 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                     {
                         int cur_weapon = KAINWEAPON_LSWORD;
                         if (strcmp(attack, "1stattack_damage") == 0) {
-                            printf("\nLword %f\n", atof(kv->value));
                             KAIN->weapons[cur_weapon].first_attack_damage = atof(kv->value);
                         } else if (strcmp(attack, "2ndattack_damage") == 0) {
                             KAIN->weapons[cur_weapon].second_attack_damage = atof(kv->value);

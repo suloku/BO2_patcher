@@ -32,7 +32,7 @@ typedef struct {
 //Config structures
 
 #define KAIN_MAX_LEVELS 26 // From level_00 to level_25
-#define MAX_FILENAME 20 // For weapon names like "soulreaver"
+#define MAX_TUNEDATA_FILENAME 20 // For weapon names like "soulreaver"
 #define KAIN_MAX_WEAPONS 10 // For weapon names like "soulreaver"
 #define MAX_LEVEL_ARRAY 1024
 
@@ -58,7 +58,7 @@ enum KainWeaponType
 
 // Sub-structure for weapon damage data
 typedef struct {
-    char name[MAX_FILENAME]; // e.g., "hands", "lsword"
+    char name[MAX_TUNEDATA_FILENAME]; // e.g., "hands", "lsword"
     float first_attack_damage; // 1stattack_damage
     float second_attack_damage; // 2ndattack_damage
     float third_attack_damage; // 3rdattack_damage
@@ -74,7 +74,7 @@ typedef struct {
 
 // Main structure for all configuration data
 typedef struct {
-    char kainFile[MAX_FILENAME]; // e.g., "default", "Kain", "Kainb", "Kainc"...
+    char kainFile[MAX_TUNEDATA_FILENAME]; // e.g., "default", "Kain", "Kainb", "Kainc"...
     float wipe_chance;
     float lorePerParticle;
     int32_t get_up_presses; // Stored as float per requirement
@@ -85,7 +85,7 @@ typedef struct {
 } KAIN_tunedata;
 
 typedef struct {
-    char npcFile[MAX_FILENAME]; //.tunedata files are quite short (8-16 chars), but better be safe
+    char npcFile[MAX_TUNEDATA_FILENAME]; //.tunedata files are quite short (8-16 chars), but better be safe
     float HitPoints;
     float CrawlHitPoints;
     float healthSuckSpeed;
@@ -96,14 +96,14 @@ typedef struct {
 } NPC_tunedata;
 
 typedef struct {
-    char weaponFile[MAX_FILENAME];
+    char weaponFile[MAX_TUNEDATA_FILENAME];
     float HP;
     int32_t grabLoops;
     char levels[MAX_LEVEL_ARRAY];  // Array of strings (level names). 1024 should be enough chars even if all level names are written.
 }WEAPON_tunedata;
 
 typedef struct {
-    char chestFile[MAX_FILENAME];
+    char chestFile[MAX_TUNEDATA_FILENAME];
     float lore;
     char levels[MAX_LEVEL_ARRAY];  // Array of strings (level names). 1024 should be enough chars even if all level names are written.
 }CHEST_tunedata;

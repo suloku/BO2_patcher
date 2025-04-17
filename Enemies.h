@@ -25,7 +25,7 @@ const char *npcFilesToModNames[] = {
 
     "bmadanf",     //Barmaid
 
-    "spider",   //Demon Spirder
+    "spider",   //Demon Spider
 
     "eylanm",   //Eyeless wretches
     "eylbnf",
