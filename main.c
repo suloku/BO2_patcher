@@ -26,6 +26,10 @@ Config config;
 char *kainFilenameNoExtension;
 char *levelFilenameNoExtension;
 
+#define DUMP_MODE 0
+#define PATCH_MODE 1
+int program_mode = DUMP_MODE;
+
 void my_exit();
 
 int get_kain_level_lore_offset(int level)
@@ -65,15 +69,18 @@ int main(int argc, char *argv[]) {
     //Load configuration file
     append_directory(runPath, "config.ini", filename, sizeof(filename));
     init_config(&config);
-    if (parse_ini(filename, &config) == -1)
+    if (program_mode == PATCH_MODE)
     {
-        my_exit();
-    }
+        if (parse_ini(filename, &config) == -1)
+        {
+            my_exit();
+        }
     //print_config(&config);
+    }
 
     EXTRA_config EXTRA_cfg;
     init_EXTRA_config(&EXTRA_cfg);
-    get_config_EXTRA(&config, &EXTRA_cfg);
+    if (program_mode == PATCH_MODE) get_config_EXTRA(&config, &EXTRA_cfg);
 
     KAIN_tunedata tempKAINconfig;
     init_KAIN_config(&tempKAINconfig);
@@ -139,7 +146,8 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    //TODO: reimplement lore per particle checks
+    //TODO: somehow reimplement lore per particle checks, currently relies on user.
+    //Idea: go trough the config file searching for the key values and try to find some incompatibility
     /*
     if (fmod(new_RedChest_Lore, lorePerParticle) != 0)
     {
@@ -165,7 +173,7 @@ int main(int argc, char *argv[]) {
     entryList = createBigFileEntryList();
 
     //Comment to skip kain*.big files for debugging
-    goto skipKain;
+    //goto skipKain;
 
     for (i=0; i < kainbigfilecount; i++)
     {
@@ -212,7 +220,7 @@ int main(int argc, char *argv[]) {
 
                 //Change wipe chance
                 replace_offset = current->data.fileOffset+wipe_chance_offset;
-                if (tempKAINconfig.wipe_chance != -1)
+                if (tempKAINconfig.wipe_chance != -1 && program_mode == PATCH_MODE)
                 {
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.wipe_chance, sizeof(tempKAINconfig.wipe_chance)) == 0)
                     {
@@ -226,12 +234,13 @@ int main(int argc, char *argv[]) {
                 {
                     float temp = 0;
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    printf("\t\tWipe Chance:  keeping value in file (no setting found) %06.2f.\n", temp);
+                    if (program_mode == PATCH_MODE) printf("\t\tWipe Chance:  keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tWipe Chance:\t\t %06.2f\n", temp);
                 }
 
                 //Change Lore Per Particle
                 replace_offset = current->data.fileOffset+lorePerParticle_offset;
-                if (tempKAINconfig.lorePerParticle != -1)
+                if (tempKAINconfig.lorePerParticle != -1 && program_mode == PATCH_MODE)
                 {
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.lorePerParticle, sizeof(tempKAINconfig.lorePerParticle)) == 0)
                     {
@@ -245,12 +254,13 @@ int main(int argc, char *argv[]) {
                 {
                     float temp = 0;
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    printf("\t\tLore particles:  keeping value in file (no setting found) %06.2f.\n", temp);
+                    if (program_mode == PATCH_MODE) printf("\t\tLore particles:  keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tLore particles:\t\t %06.2f\n", temp);
                 }
 
                 //Change number of button presses for Kain to get up after knockdown
                 replace_offset = current->data.fileOffset+KainHitReactControls_offset;
-                if (tempKAINconfig.get_up_presses != -1)
+                if (tempKAINconfig.get_up_presses != -1 && program_mode == PATCH_MODE)
                 {
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.get_up_presses, sizeof(tempKAINconfig.get_up_presses)) == 0)
                     {
@@ -264,12 +274,13 @@ int main(int argc, char *argv[]) {
                 {
                     int32_t temp = 0;
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    printf("\t\tKnockdown button presses:  keeping value in file (no setting found) %03d.\n", temp);
+                    if (program_mode == PATCH_MODE) printf("\t\tKnockdown button presses:  keeping value in file (no setting found) %03d\n", temp);
+                    else printf("\t\tKnockdown button presses: %03d\n", temp);
                 }
 
                 //Change Vampire Weapon Damage Multiplier
                 replace_offset = current->data.fileOffset+vampireWeaponDamageMultiplier_offset;
-                if (tempKAINconfig.vampireWeaponMultiplier != -1)
+                if (tempKAINconfig.vampireWeaponMultiplier != -1 && program_mode == PATCH_MODE)
                 {
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.vampireWeaponMultiplier, sizeof(tempKAINconfig.vampireWeaponMultiplier)) == 0)
                     {
@@ -283,12 +294,13 @@ int main(int argc, char *argv[]) {
                 {
                     float temp = 0;
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    printf("\t\tVampire Weapon Damage Multiplier: keeping value in file (no setting found) %06.2f.\n", temp);
+                    if (program_mode == PATCH_MODE) printf("\t\tVampire Weapon Damage Multiplier: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tVampire Weapon Damage Multiplier: %06.2f\n", temp);
                 }
 
                 //Change Max Lore Levels
                 replace_offset = current->data.fileOffset+numLoreLevels_offset;
-                if (tempKAINconfig.maxLoreLevels != -1)
+                if (tempKAINconfig.maxLoreLevels != -1 && program_mode == PATCH_MODE)
                 {
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.maxLoreLevels, sizeof(tempKAINconfig.maxLoreLevels)) == 0)
                     {
@@ -302,7 +314,8 @@ int main(int argc, char *argv[]) {
                 {
                     int32_t temp = 0;
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    printf("\t\tMax Lore Levels: keeping value in file (no setting found) %03d\n", temp);
+                    if (program_mode == PATCH_MODE) printf("\t\tMax Lore Levels: keeping value in file (no setting found) %03d\n", temp);
+                    else printf("\t\tMax Lore Levels:\t %03d\n", temp);
                 }
 
                 //Change Kain's level data
@@ -310,7 +323,7 @@ int main(int argc, char *argv[]) {
                 for (j=0;j<KAIN_TOTAL_LEVELS;j++)
                 {
                     replace_offset = current->data.fileOffset+get_kain_level_lore_offset(j);
-                    if (tempKAINconfig.levels[j].lore != -1)
+                    if (tempKAINconfig.levels[j].lore != -1 && program_mode == PATCH_MODE)
                     {
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.levels[j].lore, sizeof(tempKAINconfig.levels[j].lore)) == 0)
                         {
@@ -324,13 +337,14 @@ int main(int argc, char *argv[]) {
                     {
                         float temp = 0;
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                        printf("\t\tKain's Level %d Lore:\tkeeping value in file (no setting found) %06.2f.\n", j, temp);
+                        if (program_mode == PATCH_MODE) printf("\t\t\tKain's Level %d Lore:\tkeeping value in file (no setting found) %06.2f\n", j, temp);
+                        else printf("\t\t\tKain's Level %d Lore:\t %06.2f\n", j, temp);
                     }
 
 
                     //Patch HP
                     replace_offset = current->data.fileOffset+get_kain_level_hp_offset(j);
-                    if (tempKAINconfig.levels[j].hp != -1)
+                    if (tempKAINconfig.levels[j].hp != -1 && program_mode == PATCH_MODE)
                     {
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.levels[j].hp, sizeof(tempKAINconfig.levels[j].hp)) == 0)
                         {
@@ -344,7 +358,8 @@ int main(int argc, char *argv[]) {
                     {
                         float temp = 0;
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                        printf("\t\t\tKain's Level %d HP:\tkeeping value in file (no setting found) %06.2f\n", j, temp);
+                        if (program_mode == PATCH_MODE) printf("\t\t\tKain's Level %d HP:\tkeeping value in file (no setting found) %06.2f\n", j, temp);
+                        else printf("\t\t\tKain's Level %d HP:\t %06.2f\n", j, temp);
                     }
                 }
 
@@ -360,7 +375,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].first_attack != 0)
                     {
                         replace_offset = current->data.fileOffset+weapon_offsets[j].first_attack;
-                        if (tempKAINconfig.weapons[j].first_attack_damage != -1)
+                        if (tempKAINconfig.weapons[j].first_attack_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].first_attack_damage , sizeof(tempKAINconfig.weapons[j].first_attack_damage )) == 0)
                             {
@@ -374,7 +389,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\t1st attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\t1st attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\t1st attack damage:\t\t%06.2f\n", temp);
                         }
                     }
 
@@ -382,7 +398,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].second_attack != 0)
                     {
                        replace_offset = current->data.fileOffset+weapon_offsets[j].second_attack;
-                        if (tempKAINconfig.weapons[j].second_attack_damage != -1)
+                        if (tempKAINconfig.weapons[j].second_attack_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].second_attack_damage , sizeof(tempKAINconfig.weapons[j].second_attack_damage )) == 0)
                             {
@@ -396,7 +412,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\t2nd attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\t2nd attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\t2nd attack damage:\t\t%06.2f\n", temp);
                         }
                     }
 
@@ -404,7 +421,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].third_attack != 0)
                     {
                        replace_offset = current->data.fileOffset+weapon_offsets[j].third_attack;
-                        if (tempKAINconfig.weapons[j].third_attack_damage != -1)
+                        if (tempKAINconfig.weapons[j].third_attack_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].third_attack_damage , sizeof(tempKAINconfig.weapons[j].third_attack_damage )) == 0)
                             {
@@ -418,7 +435,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\t3rd attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\t3rd attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\t3rd attack damage:\t\t%06.2f\n", temp);
                         }
                     }
 
@@ -426,7 +444,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].ground != 0)
                     {
                        replace_offset = current->data.fileOffset+weapon_offsets[j].ground;
-                        if (tempKAINconfig.weapons[j].ground_damage != -1)
+                        if (tempKAINconfig.weapons[j].ground_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].ground_damage , sizeof(tempKAINconfig.weapons[j].ground_damage )) == 0)
                             {
@@ -440,7 +458,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tGround attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tGround attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tGround attack damage:\t\t%06.2f\n", temp);
                         }
                     }
 
@@ -448,7 +467,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].grab_loop != 0)
                     {
                        replace_offset = current->data.fileOffset+weapon_offsets[j].grab_loop;
-                        if (tempKAINconfig.weapons[j].grab_loop_damage != -1)
+                        if (tempKAINconfig.weapons[j].grab_loop_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].grab_loop_damage , sizeof(tempKAINconfig.weapons[j].grab_loop_damage )) == 0)
                             {
@@ -462,7 +481,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tGrab Loop attack damage:\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tGrab Loop attack damage:\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tGrab Loop attack damage:\t%06.2f\n", temp);
                         }
                     }
 
@@ -470,7 +490,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].grab_final != 0)
                     {
                        replace_offset = current->data.fileOffset+weapon_offsets[j].grab_final;
-                        if (tempKAINconfig.weapons[j].grab_final_damage != -1)
+                        if (tempKAINconfig.weapons[j].grab_final_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].grab_final_damage , sizeof(tempKAINconfig.weapons[j].grab_final_damage )) == 0)
                             {
@@ -484,7 +504,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tGrab Final attack damage:\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tGrab Final attack damage:\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tGrab Final attack damage:\t%06.2f\n", temp);
                         }
                     }
 
@@ -492,7 +513,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].grab_throw != 0)
                     {
                        replace_offset = current->data.fileOffset+weapon_offsets[j].grab_throw;
-                        if (tempKAINconfig.weapons[j].grab_throw_damage != -1)
+                        if (tempKAINconfig.weapons[j].grab_throw_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].grab_throw_damage , sizeof(tempKAINconfig.weapons[j].grab_throw_damage )) == 0)
                             {
@@ -506,7 +527,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tGrab Throw attack damage:\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tGrab Throw attack damage:\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tGrab Throw attack damage:\t%06.2f\n", temp);
                         }
                     }
 
@@ -514,7 +536,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].charge_move != 0)
                     {
                        replace_offset = current->data.fileOffset+weapon_offsets[j].charge_move;
-                        if (tempKAINconfig.weapons[j].fury_damage != -1)
+                        if (tempKAINconfig.weapons[j].fury_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].fury_damage , sizeof(tempKAINconfig.weapons[j].fury_damage )) == 0)
                             {
@@ -528,7 +550,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tFury attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tFury attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tFury attack damage:\t\t%06.2f\n", temp);
                         }
                     }
 
@@ -536,7 +559,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].super_jump != 0)
                     {
                        replace_offset = current->data.fileOffset+weapon_offsets[j].super_jump;
-                        if (tempKAINconfig.weapons[j].jump_damage != -1)
+                        if (tempKAINconfig.weapons[j].jump_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].jump_damage , sizeof(tempKAINconfig.weapons[j].jump_damage )) == 0)
                             {
@@ -550,7 +573,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tJump attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tJump attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tJump attack damage:\t\t%06.2f\n", temp);
                         }
                     }
 
@@ -558,7 +582,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].speed_attack != 0)
                     {
                        replace_offset = current->data.fileOffset+weapon_offsets[j].speed_attack;
-                        if (tempKAINconfig.weapons[j].berserk_damage != -1)
+                        if (tempKAINconfig.weapons[j].berserk_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].berserk_damage , sizeof(tempKAINconfig.weapons[j].berserk_damage )) == 0)
                             {
@@ -572,7 +596,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tBerserk attack damage:\t\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tBerserk attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tBerserk attack damage:\t\t%06.2f\n", temp);
                         }
                     }
 
@@ -580,7 +605,7 @@ int main(int argc, char *argv[]) {
                     if (weapon_offsets[j].last_speed_attack != 0)
                     {
                        replace_offset = current->data.fileOffset+weapon_offsets[j].last_speed_attack;
-                        if (tempKAINconfig.weapons[j].lastberserk_damage != -1)
+                        if (tempKAINconfig.weapons[j].lastberserk_damage != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.weapons[j].lastberserk_damage , sizeof(tempKAINconfig.weapons[j].lastberserk_damage )) == 0)
                             {
@@ -594,7 +619,8 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tBerserk final attack damage:\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tBerserk final attack damage:\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tBerserk final attack damage:\t%06.2f\n", temp);
                         }
                     }
 
@@ -653,7 +679,9 @@ int main(int argc, char *argv[]) {
 
     printf("\nKain.tunedata patched in all kainX.big files.\n");
 
+//goto tag
 skipKain:
+
    //Collectables
    //Scan trough every game level, find the coll_lore.tunedata, coll_biglore.tunedata and coll_weapon.tunedata files and change the lore
     i = 0;
@@ -743,7 +771,7 @@ skipKain:
 
                     //Change collectible lore
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
-                    if ( strcmp(tempCHESTconfig.chestFile, "coll_lore") == 0 && tempCHESTconfig.lore != -1)
+                    if ( strcmp(tempCHESTconfig.chestFile, "coll_lore") == 0 && tempCHESTconfig.lore != -1 && program_mode == PATCH_MODE)
                     {
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempCHESTconfig.lore, sizeof(tempCHESTconfig.lore)) == 0)
                         {
@@ -757,7 +785,8 @@ skipKain:
                     {
                         float temp = 0;
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                        printf("\t\t\tRed Chest lore:\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        if (program_mode == PATCH_MODE) printf("\t\t\tRed Chest lore:\tkeeping value in file (no setting found) %06.2f\n", temp);
+                        else printf("\t\t\tRed Chest lore:\t %06.2f\n", temp);
                     }
 
                     //Go to next file
@@ -777,7 +806,7 @@ skipKain:
 
                     //Change collectible lore
                     replace_offset = current->data.fileOffset+collectable_lore_offset;
-                    if ( strcmp(tempCHESTconfig.chestFile, "coll_biglore") == 0 && tempCHESTconfig.lore != -1)
+                    if ( strcmp(tempCHESTconfig.chestFile, "coll_biglore") == 0 && tempCHESTconfig.lore != -1 && program_mode == PATCH_MODE)
                     {
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempCHESTconfig.lore, sizeof(tempCHESTconfig.lore)) == 0)
                         {
@@ -791,7 +820,8 @@ skipKain:
                     {
                         float temp = 0;
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                        printf("\t\t\tBlue Chest lore:\tkeeping value in file (no setting found) %06.2f.\n", temp);
+                        if (program_mode == PATCH_MODE) printf("\t\t\tBlue Chest lore:\tkeeping value in file (no setting found) %06.2f\n", temp);
+                        else printf("\t\t\tBlue Chest lore:\t %06.2f\n", temp);
                     }
 
                     //Go to next file
@@ -817,7 +847,7 @@ skipKain:
 
                         //NPCs hitpoints
                         replace_offset = current->data.fileOffset+npc_HitPoints_offset;
-                        if (tempNPCconfig.HitPoints != -1)
+                        if (tempNPCconfig.HitPoints != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempNPCconfig.HitPoints, sizeof(tempNPCconfig.HitPoints)) == 0)
                             {
@@ -831,12 +861,13 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tHP:\t\t keeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tHP:\t\t keeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tHP:\t\t %06.2f\n", temp);
                         }
 
                     //Replace Crawl Hitpoints
                         replace_offset = current->data.fileOffset+npc_crawl_away_data_hitpoints_offset;
-                        if (tempNPCconfig.CrawlHitPoints != -1)
+                        if (tempNPCconfig.CrawlHitPoints != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempNPCconfig.CrawlHitPoints, sizeof(tempNPCconfig.CrawlHitPoints)) == 0)
                             {
@@ -846,16 +877,17 @@ skipKain:
                                 printf("\t\t\tCrawling HP:\t Failed to replace.\n");
                             }
                         }
-                        else
+                        else if (tempNPCconfig.CrawlHitPoints == -1 || program_mode == DUMP_MODE)
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tCrawling HP:\t keeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tCrawling HP:\t keeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tCrawling HP:\t %06.2f\n", temp);
                         }
 
                     //Replace Max Blood
                         replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_normalMaxBlood_offset;
-                        if (tempNPCconfig.normalMaxBlood != -1)
+                        if (tempNPCconfig.normalMaxBlood != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempNPCconfig.normalMaxBlood, sizeof(tempNPCconfig.normalMaxBlood)) == 0)
                             {
@@ -869,12 +901,13 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tBlood:\t\t keeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tBlood:\t\t keeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tBlood:\t\t %06.2f\n", temp);
                         }
 
                     //Replace Max Stealth Blood
                         replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_stealthKillMaxBlood_offset;
-                        if (tempNPCconfig.stealtKillMaxBlood != -1)
+                        if (tempNPCconfig.stealtKillMaxBlood != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempNPCconfig.stealtKillMaxBlood, sizeof(tempNPCconfig.stealtKillMaxBlood)) == 0)
                             {
@@ -888,7 +921,8 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tStealth Blood:\t keeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tStealth Blood:\t keeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tStealth Blood:\t %06.2f\n", temp);
                         }
 
                     //Replace Bloodsuck Rate
@@ -911,13 +945,14 @@ skipKain:
                         }
 
                         //Keep default value if we aren't using proportional rate or there is no value for this NPC
-                        if (tempNPCconfig.healthSuckSpeed == -1 && !EXTRA_cfg.proportionalBloodSuck)
+                        if (tempNPCconfig.healthSuckSpeed == -1 && !EXTRA_cfg.proportionalBloodSuck && program_mode == PATCH_MODE)
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tBlood Suck Rate: keeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tBlood Suck Rate: keeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tBlood Suck Rate:\t %06.2f\n", temp);
                         }
-                        else //We have to replace the blood suck rate
+                        else if ( program_mode == PATCH_MODE) //We have to replace the blood suck rate
                         {
                             //Use BSR specified in config file if appropiate
                             if (!EXTRA_cfg.proportionalBloodSuck)
@@ -936,7 +971,7 @@ skipKain:
 
                     //Replace Lore
                         replace_offset = current->data.fileOffset+npc_BloodSuckTunedata_maxLore_offset;
-                        if (tempNPCconfig.maxLore != -1)
+                        if (tempNPCconfig.maxLore != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempNPCconfig.maxLore, sizeof(tempNPCconfig.maxLore)) == 0)
                             {
@@ -950,7 +985,8 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tLore:\t\t keeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tLore:\t\t keeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tLore:\t\t %06.2f\n", temp);
                         }
 
                         break;//test next file
@@ -974,7 +1010,7 @@ skipKain:
                         //Update weapon parameters
                         //Change weapon's HP
                         replace_offset = current->data.fileOffset+weaponTune_weaponHP_offset;
-                        if (tempWEAPONconfig.HP != -1)
+                        if (tempWEAPONconfig.HP != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempWEAPONconfig.HP, sizeof(tempWEAPONconfig.HP)) == 0)
                             {
@@ -988,12 +1024,13 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tHP:\t\t keeping value in file (no setting found) %06.2f.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tHP:\t\t keeping value in file (no setting found) %06.2f\n", temp);
+                            else printf("\t\t\tHP:\t\t %06.2f\n", temp);
                         }
 
                         //Change number of grab loops
                         replace_offset = current->data.fileOffset+weaponTune_GrabLoopTimes_offset;
-                        if (tempWEAPONconfig.HP != -1)
+                        if (tempWEAPONconfig.HP != -1 && program_mode == PATCH_MODE)
                         {
                             if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempWEAPONconfig.grabLoops, sizeof(tempWEAPONconfig.grabLoops)) == 0)
                             {
@@ -1007,7 +1044,8 @@ skipKain:
                         {
                             int32_t temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            printf("\t\t\tGrab attack #:\t keeping value in file (no setting found) %02d.\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\tGrab attack #:\t keeping value in file (no setting found) %02d.\n", temp);
+                            else printf("\t\t\tGrab attack #:\t %03d.\n", temp);
                         }
                     }
                     break;//test next file
