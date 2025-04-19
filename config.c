@@ -681,6 +681,14 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                         }
                     }
                 }
+                else if (strcmp(kv->key, "hands_grabLoops") == 0)
+                {
+                    KAIN->hands_grabLoops = atoi(kv->value);
+                }
+                else if (strcmp(kv->key, "soulreaver_grabLoops ") == 0)
+                {
+                    KAIN->soulreaver_grabLoops = atoi(kv->value);
+                }
                 else if (strncmp(kv->key, "hands_", 6) == 0)
                 {
                     char attack[20];

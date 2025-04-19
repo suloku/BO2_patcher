@@ -80,6 +80,8 @@ typedef struct {
     int32_t get_up_presses; // Stored as float per requirement
     float vampireWeaponMultiplier;
     int32_t maxLoreLevels; // Stored as float per requirement
+    int32_t hands_grabLoops;
+    int32_t soulreaver_grabLoops;
     KainLevelData levels[KAIN_MAX_LEVELS]; // level_00 to level_25
     KainWeaponData weapons[KAIN_MAX_WEAPONS]; // hands, lsword, dagger, handax, crossbow, polearm, hsword, club, mace, soulreaver
 } KAIN_tunedata;
