@@ -429,6 +429,8 @@ bool get_config_WEAPON(Config* config, WEAPON_tunedata* WEAPON, const char* weap
 // In this case there are some default values
 void init_EXTRA_config(EXTRA_config* EXTRA_CFG)
 {
+    EXTRA_CFG->skipKainFiles = false;
+    EXTRA_CFG->skipLevelFiles = false;
     EXTRA_CFG->proportionalBloodSuck = false;
     EXTRA_CFG->npc_bloodsuckratio_0_50 = 1.0;
     EXTRA_CFG->npc_bloodsuckratio_51_75 = 1.25;
@@ -455,7 +457,21 @@ void get_config_EXTRA(Config* config, EXTRA_config* EXTRA_CFG) {
                 const KeyValue* kv = &section->keys[j];
                 trim_leading_spaces((char*)kv->value);
 
-                if (strcmp(kv->key, "proportionalBSR") == 0)
+                if (strcmp(kv->key, "skip_kain_files ") == 0)
+                {
+                    if (strcmp(kv->value, "true") == 0)
+                    {
+                        EXTRA_CFG->skipKainFiles = true;
+                    }
+                }
+                else if (strcmp(kv->key, "skip_level_files") == 0)
+                {
+                    if (strcmp(kv->value, "true") == 0)
+                    {
+                        EXTRA_CFG->skipLevelFiles = true;
+                    }
+                }
+                else if (strcmp(kv->key, "proportionalBSR") == 0)
                 {
                     if (strcmp(kv->value, "true") == 0)
                     {
@@ -607,6 +623,8 @@ void init_KAIN_config(KAIN_tunedata* KAIN)
         KAIN->levels[i].hp = -1;
         KAIN->levels[i].lore = -1;
     }
+    KAIN->hands_grabLoops = -1;
+    KAIN->soulreaver_grabLoops = -1;
     for (int i = 0; i < KAIN_MAX_WEAPONS; i++)
     {
         KAIN->weapons[i].name[0] = '\0';
@@ -1043,7 +1061,6 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                         if (KAIN->weapons[i].lastberserk_damage == -1) KAIN->weapons[i].lastberserk_damage = defaultKAIN.weapons[i].lastberserk_damage;
                         if (KAIN->weapons[i].grab_throw_damage == -1) KAIN->weapons[i].grab_throw_damage = defaultKAIN.weapons[i].grab_throw_damage;
                     }
-                    KainWeaponData weapons[KAIN_MAX_WEAPONS];
                 }
 
                 break;

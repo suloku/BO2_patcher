@@ -111,6 +111,8 @@ typedef struct {
 }CHEST_tunedata;
 
 typedef struct {
+    bool skipKainFiles;
+    bool skipLevelFiles;
     bool proportionalBloodSuck;
     float npc_bloodsuckratio_0_50;
     float npc_bloodsuckratio_51_75;
