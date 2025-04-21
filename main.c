@@ -492,7 +492,7 @@ int main(int argc, char *argv[]) {
     strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", t);
 
     // Write timestamp
-    printf( "[%s]\n", time_str);
+    printf( "[%s]\n\n", time_str);
 
     displayTitle();
 
@@ -883,6 +883,8 @@ int main(int argc, char *argv[]) {
                     if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                 }
                 //Berskerk Duration
+                //Changing this value doesn't seem to do anything in-game...
+                /*
                 replace_offset = current->data.fileOffset+kain_berserk_duration_offset;
                 if (tempKAINconfig.berserk_duration != -1 && program_mode == PATCH_MODE)
                 {
@@ -902,6 +904,7 @@ int main(int argc, char *argv[]) {
                     else printf("\t\tBerskerk Duration:\t %06.2f\n", temp);
                     if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                 }
+                */
                 //Berskerk Cost
                 replace_offset = current->data.fileOffset+kain_berserk_cost_offset;
                 if (tempKAINconfig.berserk_cost != -1 && program_mode == PATCH_MODE)

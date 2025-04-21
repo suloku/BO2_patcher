@@ -46,7 +46,10 @@ int kain_charm_regen_time_offset = 0x594;
 int kain_fury_cost_offset = 0x5A8;
 int kain_immolate_cost_offset = 0x5E8;
 int kain_immolate_damage_offset = 0x60c;
-int kain_berserk_duration_offset = 0x640;
+int kain_berserk_duration_offset = 0x640;	        // desc=Number_of_seconds_speed_lasts_for default=10.
+//int kain_berserk_slowSpeed_offset = 0x644;			// desc=What_speed_we_set_the_rest_of_the_world_to_when_attacking default=0.50
+//int kain_berserk_frozenSpeed_offset = 0x648;		// desc=What_speed_we_set_the_rest_of_the_world_to_when_we_freeze_the_world default=0.15
+//int kain_berserk_speedChangeRate_offset = 0x64c;	// desc=How_fast_the_time_class_rates_can_change default=1.5
 int kain_berserk_cost_offset = 0x650;
 int kain_stealth_regen_time_offset = 0x6b8;
 int kain_superjump_regen_time_offset = 0x6d0;

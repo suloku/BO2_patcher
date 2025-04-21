@@ -92,7 +92,7 @@ typedef struct {
     float fury_cost;
     float immolate_cost;
     float immolate_damage;
-    float berserk_duration;
+    float berserk_duration; //changing this value doesn't seem to do anything...
     float berserk_cost;
     float stealth_regentime;
     float superjump_regentime;
