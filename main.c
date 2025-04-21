@@ -179,6 +179,49 @@ int select_ini_file(char *selected_file) {
     }
 }
 
+void replace_slash_with_underscore(char *str) {
+    if (str == NULL) return;
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == '/') {
+            str[i] = '_';
+        }
+    }
+}
+
+int dump_fromBigFile(const char* BigFile, long start_offset, const char* dumpfilename, int filesize) {
+        char dumpfile[PATH_MAX];
+        char dumpfile2[PATH_MAX];
+        char file2dump[PATH_MAX];
+        strcpy(file2dump, dumpfilename);
+        replace_slash_with_underscore(file2dump);
+       FILE *fp;
+       append_directory(runPath,"region", dumpfile, sizeof(dumpfile));
+       mkdir(dumpfile);
+       append_directory(dumpfile, file2dump, dumpfile2, sizeof(dumpfile2));
+       printf ("\n\nOpening %s...\n", dumpfile2);
+       fp = fopen(dumpfile2, "wb");
+       if (fp == NULL) {
+          printf("Error opening %s", dumpfile2);
+          return 1;
+       }
+        uint32_t buffer;
+        for (int i=0;i<filesize;i+=4)
+        {
+            buffer = 0;
+            read_4_bytes_from_file(BigFile, start_offset+i, (unsigned char *)&buffer);
+            //printf ("0x%X\n", buffer);
+            if (fwrite(&buffer, 1, 4, fp) != 4) {
+                perror("Error writing to file");
+                fclose(fp);
+                return -1;
+            }
+
+        }
+
+   fclose(fp);
+   return 0;
+}
+
 int main(int argc, char *argv[]) {
 
     displayTitle();
@@ -409,7 +452,7 @@ int main(int argc, char *argv[]) {
     if (EXTRA_cfg.skipKainFiles)
     {
         printf("\nSkipping patching kainX.big files...\n");
-        goto skipLevels;
+        goto skipKain;
     }
 
     if (dumpDataCSV && program_mode == DUMP_MODE)
@@ -569,6 +612,331 @@ int main(int argc, char *argv[]) {
                     if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%d;", temp);
                 }
 
+                //Thirst parameters
+
+                //Heath increase rate
+                replace_offset = current->data.fileOffset+kain_healthIncreaseRate_offset;
+                if (tempKAINconfig.health_Increase_Rate != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.health_Increase_Rate, sizeof(tempKAINconfig.health_Increase_Rate)) == 0)
+                    {
+                        printf("\t\tHealth Increase Rate: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.health_Increase_Rate);
+                    } else
+                    {
+                        printf("\t\tHealth Increase Rate: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Health Increase Rate: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tHealth Increase Rate:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Lore increase rate
+                replace_offset = current->data.fileOffset+kain_loreIncreaseRate_offset;
+                if (tempKAINconfig.lore_Increase_Rate != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.lore_Increase_Rate, sizeof(tempKAINconfig.lore_Increase_Rate)) == 0)
+                    {
+                        printf("\t\tLore Increase Rate: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.lore_Increase_Rate);
+                    } else
+                    {
+                        printf("\t\tLore Increase Rate: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Lore Increase Rate: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tLore Increase Rate:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Thirst drain rate
+                replace_offset = current->data.fileOffset+kain_thirstDrainRate_offset;
+                if (tempKAINconfig.thirst_drain_rate != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.thirst_drain_rate, sizeof(tempKAINconfig.thirst_drain_rate)) == 0)
+                    {
+                        printf("\t\tThirst Drain Rate: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.thirst_drain_rate);
+                    } else
+                    {
+                        printf("\t\tThirst Drain Rate: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Thirst Drain Rate: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tThirst Drain Rate:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Thirst drain min %
+                replace_offset = current->data.fileOffset+kain_thirstMinPercent_offset;
+                if (tempKAINconfig.thirst_min_percent != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.thirst_min_percent, sizeof(tempKAINconfig.thirst_min_percent)) == 0)
+                    {
+                        printf("\t\tThirst Drain min%%: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.thirst_min_percent);
+                    } else
+                    {
+                        printf("\t\tThirst Drain min%%: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Thirst Drain min%%: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tThirst Drain min%%:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Thirst Drain interval
+                replace_offset = current->data.fileOffset+kain_thirstDrainTime_offset;
+                if (tempKAINconfig.thirst_drain_time != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.thirst_drain_time, sizeof(tempKAINconfig.thirst_drain_time)) == 0)
+                    {
+                        printf("\t\tThirst Drain interval: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.thirst_drain_time);
+                    } else
+                    {
+                        printf("\t\tThirst Drain interval: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Thirst Drain interval: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tThirst Drain interval:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Thirst Drain amount
+                replace_offset = current->data.fileOffset+kain_thirstDrainAmount_offset;
+                if (tempKAINconfig.thirst_drain_amount != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.thirst_drain_amount, sizeof(tempKAINconfig.thirst_drain_amount)) == 0)
+                    {
+                        printf("\t\tThirst Drain amount: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.thirst_drain_amount);
+                    } else
+                    {
+                        printf("\t\tThirst Drain amount: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Thirst Drain amount: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tThirst Drain amount:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+
+                //DARK GIFTS
+                //Charm regen time
+                replace_offset = current->data.fileOffset+kain_charm_regen_time_offset;
+                if (tempKAINconfig.charm_regentime != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.charm_regentime, sizeof(tempKAINconfig.charm_regentime)) == 0)
+                    {
+                        printf("\t\tCharm regen time: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.charm_regentime);
+                    } else
+                    {
+                        printf("\t\tCharm regen time: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Charm regen time: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tCharm regen time:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Fury cost
+                replace_offset = current->data.fileOffset+kain_fury_cost_offset;
+                if (tempKAINconfig.fury_cost != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.fury_cost, sizeof(tempKAINconfig.fury_cost)) == 0)
+                    {
+                        printf("\t\tFury cost: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.fury_cost);
+                    } else
+                    {
+                        printf("\t\tFury cost: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Fury cost: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tFury cost:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Immolate cost
+                replace_offset = current->data.fileOffset+kain_immolate_cost_offset;
+                if (tempKAINconfig.immolate_cost != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.immolate_cost, sizeof(tempKAINconfig.immolate_cost)) == 0)
+                    {
+                        printf("\t\tImmolate cost: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.immolate_cost);
+                    } else
+                    {
+                        printf("\t\tImmolate cost: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Immolate cost: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tImmolate cost:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Immolate damage
+                replace_offset = current->data.fileOffset+kain_immolate_damage_offset;
+                if (tempKAINconfig.immolate_damage != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.immolate_damage, sizeof(tempKAINconfig.immolate_damage)) == 0)
+                    {
+                        printf("\t\tImmolate damage: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.immolate_damage);
+                    } else
+                    {
+                        printf("\t\tImmolate damage: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Immolate damage: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tImmolate damage:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Berskerk Duration
+                replace_offset = current->data.fileOffset+kain_berserk_duration_offset;
+                if (tempKAINconfig.berserk_duration != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.berserk_duration, sizeof(tempKAINconfig.berserk_duration)) == 0)
+                    {
+                        printf("\t\tBerskerk Duration: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.berserk_duration);
+                    } else
+                    {
+                        printf("\t\tBerskerk Duration: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Berskerk Duration: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tBerskerk Duration:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Berskerk Cost
+                replace_offset = current->data.fileOffset+kain_berserk_cost_offset;
+                if (tempKAINconfig.berserk_cost != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.berserk_cost, sizeof(tempKAINconfig.berserk_cost)) == 0)
+                    {
+                        printf("\t\tBerskerk Cost: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.berserk_cost);
+                    } else
+                    {
+                        printf("\t\tBerskerk Cost: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Berskerk Cost: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tBerskerk Cost:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Stealth regen time
+                replace_offset = current->data.fileOffset+kain_stealth_regen_time_offset;
+                if (tempKAINconfig.stealth_regentime != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.stealth_regentime, sizeof(tempKAINconfig.stealth_regentime)) == 0)
+                    {
+                        printf("\t\tStealth regen time: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.stealth_regentime);
+                    } else
+                    {
+                        printf("\t\tStealth regen time: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Stealth regen time: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tStealth regen time:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Super Jump regen time
+                replace_offset = current->data.fileOffset+kain_superjump_regen_time_offset;
+                if (tempKAINconfig.superjump_regentime != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.superjump_regentime, sizeof(tempKAINconfig.superjump_regentime)) == 0)
+                    {
+                        printf("\t\tSuper Jump regen time: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.superjump_regentime);
+                    } else
+                    {
+                        printf("\t\tSuper Jump regen time: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Super Jump regen time: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tSuper Jump regen time:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Telekinesis regen time
+                replace_offset = current->data.fileOffset+kain_telekinesis_regen_time_offset;
+                if (tempKAINconfig.telekinesis_regentime != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.telekinesis_regentime, sizeof(tempKAINconfig.telekinesis_regentime)) == 0)
+                    {
+                        printf("\t\tTelekinesis regen time: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.telekinesis_regentime);
+                    } else
+                    {
+                        printf("\t\tTelekinesis regen time: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Telekinesis regen time: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tTelekinesis regen time:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+                //Telekinesis damage
+                replace_offset = current->data.fileOffset+kain_telekinesis_damage_offset;
+                if (tempKAINconfig.telekinesis_damage != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.telekinesis_damage, sizeof(tempKAINconfig.telekinesis_damage)) == 0)
+                    {
+                        printf("\t\tTelekinesis damage: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.telekinesis_damage);
+                    } else
+                    {
+                        printf("\t\tTelekinesis damage: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t  *Telekinesis damage: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\tTelekinesis damage:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+
                 //Change Kain's level data
                 //Patch Lore
                 for (j=0;j<KAIN_TOTAL_LEVELS;j++)
@@ -588,7 +956,7 @@ int main(int argc, char *argv[]) {
                     {
                         float temp = 0;
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                        if (program_mode == PATCH_MODE) printf("\t\t\t  *Kain's Level %d Lore:\tkeeping value in file (no setting found) %06.2f\n", j, temp);
+                        if (program_mode == PATCH_MODE) printf("\t\t\t  *Kain's Level %d Lore: keeping value in file (no setting found) %06.2f\n", j, temp);
                         else printf("\t\t\tKain's Level %d Lore:\t %06.2f\n", j, temp);
                         if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                     }
@@ -610,7 +978,7 @@ int main(int argc, char *argv[]) {
                     {
                         float temp = 0;
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                        if (program_mode == PATCH_MODE) printf("\t\t\t  *Kain's Level %d HP:\tkeeping value in file (no setting found) %06.2f\n", j, temp);
+                        if (program_mode == PATCH_MODE) printf("\t\t\t  *Kain's Level %d HP:\t keeping value in file (no setting found) %06.2f\n", j, temp);
                         else printf("\t\t\tKain's Level %d HP:\t %06.2f\n", j, temp);
                         if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                     }
@@ -724,7 +1092,7 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            if (program_mode == PATCH_MODE) printf("\t\t\t  *Ground attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\t  *Ground attack damage:\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tGround attack damage:\t\t%06.2f\n", temp);
                             if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
@@ -886,7 +1254,7 @@ int main(int argc, char *argv[]) {
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            if (program_mode == PATCH_MODE) printf("\t\t\t  *Berserk attack damage:\t\tkeeping value in file (no setting found) %06.2f\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\t  *Berserk attack damage:\tkeeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tBerserk attack damage:\t\t%06.2f\n", temp);
                             if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                         }
@@ -946,7 +1314,7 @@ int main(int argc, char *argv[]) {
                 {
                     int32_t temp = 0;
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    if (program_mode == PATCH_MODE) printf("\n\t\t  *Claws Grab attack #:\t\t keeping value in file (no setting found) %02d.\n", temp);
+                    if (program_mode == PATCH_MODE) printf("\n\t\t  *Claws Grab attack #:\t\t keeping value in file (no setting found) %02d\n", temp);
                     else printf("\n\t\t\tClaws Grab attack #:\t\t %03d\n", temp);
                     if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%d;", temp);
                 }
@@ -1112,6 +1480,10 @@ skipKain:
 
         while (current != NULL)
         {
+            if (strcmp(current->data.fileType, "region")==0)
+            {
+                dump_fromBigFile(filename, current->data.fileOffset, current->data.fileName, current->data.fileLength);
+            }
             if (strcmp(current->data.fileType, "tunedata")==0)
             {
                 //printf("\n\t%s.tunedata\n", current->data.fileName);
@@ -1222,7 +1594,7 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            if (program_mode == PATCH_MODE) printf("\t\t\t  *HP:\t\t keeping value in file (no setting found) %06.2f\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\t  *HP:\t\t\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tHP:\t\t %06.2f\n", temp);
                             if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
@@ -1243,7 +1615,7 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            if (program_mode == PATCH_MODE) printf("\t\t\t  *Crawling HP:\t keeping value in file (no setting found) %06.2f\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\t  *Crawling HP:\t\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tCrawling HP:\t %06.2f\n", temp);
                             if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
@@ -1314,7 +1686,7 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            if (program_mode == PATCH_MODE) printf("\t\t\t  *Blood Suck Rate: keeping value in file (no setting found) %06.2f\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\t  *Blood Suck Rate:\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tBlood Suck Rate: %06.2f\n", temp);
                             if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
@@ -1337,7 +1709,7 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            if (program_mode == PATCH_MODE) printf("\t\t\t  *Blood Suck Rate: keeping value in file (no setting found) %06.2f\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\t  *Blood Suck Rate:\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tBlood Suck Rate: %06.2f\n", temp);
                             if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(npcCsvFileptr, "%f;", temp);
                         }
@@ -1399,7 +1771,7 @@ skipKain:
                         {
                             float temp = 0;
                             read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                            if (program_mode == PATCH_MODE) printf("\t\t\t  *HP:\t\t keeping value in file (no setting found) %06.2f\n", temp);
+                            if (program_mode == PATCH_MODE) printf("\t\t\t  *HP:\t\t\t keeping value in file (no setting found) %06.2f\n", temp);
                             else printf("\t\t\tHP:\t\t %06.2f\n", temp);
                             if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(weaponCsvFileptr, "%f;", temp);
                         }

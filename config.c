@@ -457,7 +457,7 @@ void get_config_EXTRA(Config* config, EXTRA_config* EXTRA_CFG) {
                 const KeyValue* kv = &section->keys[j];
                 trim_leading_spaces((char*)kv->value);
 
-                if (strcmp(kv->key, "skip_kain_files ") == 0)
+                if (strcmp(kv->key, "skip_kain_files") == 0)
                 {
                     if (strcmp(kv->value, "true") == 0)
                     {
@@ -623,6 +623,25 @@ void init_KAIN_config(KAIN_tunedata* KAIN)
         KAIN->levels[i].hp = -1;
         KAIN->levels[i].lore = -1;
     }
+    //Thirst
+    KAIN->health_Increase_Rate = -1;
+    KAIN->lore_Increase_Rate = -1;
+    KAIN->thirst_drain_rate = -1;
+    KAIN->thirst_min_percent = -1;
+    KAIN->thirst_drain_time = -1;
+    KAIN->thirst_drain_amount = -1;
+    //Dark Gifts
+    KAIN->charm_regentime = -1;
+    KAIN->fury_cost = -1;
+    KAIN->immolate_cost = -1;
+    KAIN->immolate_damage = -1;
+    KAIN->berserk_duration = -1;
+    KAIN->berserk_cost = -1;
+    KAIN->stealth_regentime = -1;
+    KAIN->superjump_regentime = -1;
+    KAIN->telekinesis_regentime = -1;
+    KAIN->telekinesis_damage = -1;
+    //Weapons
     KAIN->hands_grabLoops = -1;
     KAIN->soulreaver_grabLoops = -1;
     for (int i = 0; i < KAIN_MAX_WEAPONS; i++)
@@ -699,6 +718,73 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                         }
                     }
                 }
+                //Thirst
+                else if (strcmp(kv->key, "health_Increase_Rate") == 0)
+                {
+                    KAIN->health_Increase_Rate = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "lore_Increase_Rate") == 0)
+                {
+                    KAIN->lore_Increase_Rate = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "thirst_drain_rate") == 0)
+                {
+                    KAIN->thirst_drain_rate = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "thirst_min_percent") == 0)
+                {
+                    KAIN->thirst_min_percent = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "thirst_drain_time") == 0)
+                {
+                    KAIN->thirst_drain_time = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "thirst_drain_amount") == 0)
+                {
+                    KAIN->thirst_drain_amount = atof(kv->value);
+                }
+                //Dark Gifts
+                else if (strcmp(kv->key, "charm_regentime") == 0)
+                {
+                    KAIN->charm_regentime = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "fury_cost") == 0)
+                {
+                    KAIN->fury_cost = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "immolate_cost") == 0)
+                {
+                    KAIN->immolate_cost = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "immolate_damage") == 0)
+                {
+                    KAIN->immolate_damage = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "berserk_duration") == 0)
+                {
+                    KAIN->berserk_duration = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "berserk_cost") == 0)
+                {
+                    KAIN->berserk_cost = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "stealth_regentime") == 0)
+                {
+                    KAIN->stealth_regentime = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "superjump_regentime") == 0)
+                {
+                    KAIN->superjump_regentime = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "telekinesis_regentime") == 0)
+                {
+                    KAIN->telekinesis_regentime = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "telekinesis_damage") == 0)
+                {
+                    KAIN->telekinesis_damage = atof(kv->value);
+                }
+                //Weapons
                 else if (strcmp(kv->key, "hands_grabLoops") == 0)
                 {
                     KAIN->hands_grabLoops = atoi(kv->value);

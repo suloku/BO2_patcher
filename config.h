@@ -80,6 +80,25 @@ typedef struct {
     int32_t get_up_presses; // Stored as float per requirement
     float vampireWeaponMultiplier;
     int32_t maxLoreLevels; // Stored as float per requirement
+    //Thirst
+    float health_Increase_Rate;
+    float lore_Increase_Rate;
+    float thirst_drain_rate;
+    float thirst_min_percent;
+    float thirst_drain_time;
+    float thirst_drain_amount;
+    //Dark gift
+    float charm_regentime;
+    float fury_cost;
+    float immolate_cost;
+    float immolate_damage;
+    float berserk_duration;
+    float berserk_cost;
+    float stealth_regentime;
+    float superjump_regentime;
+    float telekinesis_regentime;
+    float telekinesis_damage;
+    //Weapons
     int32_t hands_grabLoops;
     int32_t soulreaver_grabLoops;
     KainLevelData levels[KAIN_MAX_LEVELS]; // level_00 to level_25
