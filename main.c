@@ -30,6 +30,7 @@ char configFilePath [PATH_MAX];
 
 //#define DATA_DUMP_MESSAGES
 //#define OUTPUT_TUNEDATA_FILES
+//#define DUMP_EXTRAFILES
 
 Config config;
 char *kainFilenameNoExtension;
@@ -1480,10 +1481,12 @@ skipKain:
 
         while (current != NULL)
         {
+#ifdef DUMP_EXTRAFILES
             if (strcmp(current->data.fileType, "region")==0)
             {
                 dump_fromBigFile(filename, current->data.fileOffset, current->data.fileName, current->data.fileLength);
             }
+#endif // DUMP_EXTRAFILES
             if (strcmp(current->data.fileType, "tunedata")==0)
             {
                 //printf("\n\t%s.tunedata\n", current->data.fileName);
