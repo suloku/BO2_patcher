@@ -1,0 +1,114 @@
+Here's a list of the location of all collectibles in the game:
+
+Red Chests: 52
+Blue Chests: 52 (+ 1 unobtainable in sl08.big)
+Weapon Chests: 16
+
+Note: Ommited levels don't have any collectable
+Note 2: to use this information for a configuration file "levels" setting, you have to use the sublevel name (what comes after the last underscore). I.E. for "smugglersden_regionfiles_sd05" the sublevel name is "sd05".
+
+CHAPTER 1	Red chests	Blue chests	Weapon Chests
+slums_sl03		2		0		0
+slums_sl04		1		0		0
+slums_sl05		2		0		1
+slums_sl06		2		0		0
+slums_sl07		1		0		0
+slums_sl08		2		1*		0
+
+* The blue chest in sl08 is apparently in the game files, but can't be got in normal gameplay.
+
+CHAPTER 2			Red chests	Blue chests	Weapon Chests
+smugglersden_regionfiles_sd01		1		0		0
+smugglersden_regionfiles_sd02		1		0		0
+smugglersden_regionfiles_sd03		2		0		1
+smugglersden_regionfiles_sd05		1		0		0
+smugglersden_regionfiles_sd07		2		0		1
+
+CHAPTER 3		Red chests	Blue chests	Weapon Chests
+lowercity_lc01			2		0		0
+lowercity_lc02a			1		0		0
+lowercity_lc02airlock		1		0		0
+lowercity_lc02b			1		0		0
+lowercity_lc03			1		0		0
+lowercity_lc04			1		0		0
+lowercity_lc05			1		0		1
+lowercity_lc05a			1		1		0
+lowercity_lc07			1		0		0
+
+CHAPTER 4		Red chests	Blue chests	Weapon Chests
+uppercitynew_uc01b		1		0		0
+uppercitynew_uc02b		0		1		1
+uppercitynew_uc03b		0		1		0
+uppercitynew_uc05		1		0		0
+uppercitynew_uc06a		1		0		0
+uppercitynew_uc07		0		1		0
+
+CHAPTER 5	Red chests	Blue chests	Weapon Chests
+keep_sk02		0		0		1
+keep_sk03a		1		0		0
+keep_sk03b		1		0		0
+keep_sk03c		1		0		0
+keep_sk04		0		0		1
+keep_sk05		1		0		0
+keep_sk07		2		0		0
+
+CHAPTER 6		Red chests	Blue chests	Weapon Chests
+industrial quarter_iq_01	1		0		0
+industrial quarter_iq_01a	1		0		0
+industrial quarter_iq_02	0		1		0
+industrial quarter_iq_03	1		0		0
+industrial quarter_iq_06	0		1		0
+industrial quarter_iq_07	0		1		0
+industrial quarter_iq_09	1		0		0
+industrial quarter_iq_10	0		1		0
+industrial quarter_iq_11	1		0		1
+industrial quarter_iq_12	0		1		0
+
+CHAPTER 7 	Red chests	Blue chests	Weapon Chests
+canyons_cy01		3		0		0
+canyons_cy02a		0		1		0
+canyons_cy03		1		1		0
+canyons_cy04		1		0		1
+canyons_cy04a		0		1		0
+canyons_cy04b		0		1		0
+canyons_cy05		0		1		0
+canyons_cy06		0		1		1
+canyons_cy07		1		0		0
+
+CHAPTER 8		Red chests	Blue chests	Weapon Chests
+eternal prison_ep02		1		1		0
+eternal prison_ep05		0		1		0
+eternal prison_ep06		2		1		1
+eternal prison_ep07		0		1		0
+eternal prison_ep08		0		2		1
+eternal prison_ep10		0		1		0
+eternal prison_ep12		0		2		0
+
+CHAPTER 9	Red chests	Blue chests	Weapon Chests
+device_dv02		0		1		0
+device_dv03		0		2		1
+device_dv04		0		3		0
+device_dv06		0		1		0
+device_dv07		0		2		0
+device_dv08		0		2		1
+device_dv09		0		1		0
+
+CHAPTER 10			Red chests	Blue chests	Weapon Chests
+wharves_regionfiles_wh01		0		2		0
+wharves_regionfiles_wh02		0		2		0
+wharves_regionfiles_wh05		0		2		1
+wharves_regionfiles_wh10		0		1		0
+wharves_regionfiles_wh12		1		0		0
+wharves_regionfiles_wh13		1		0		0
+
+CHAPTER 11		Red chests	Blue chests	Weapon Chests
+hyldencity_hc_01		0		1		0
+hyldencity_hc_04		0		1		0
+hyldencity_hc_04b		0		1		0
+hyldencity_hc_04c		0		1		0
+hyldencity_hc_05		0		1		0
+hyldencity_hc_05d		0		1		0
+hyldencity_hc_05e		0		1		0
+hyldencity_hc_05f		0		0		1
+hyldencity_hc_06		0		1		0
+hyldencity_hc_10		0		1		0
