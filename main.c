@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <float.h>
@@ -57,6 +58,55 @@ int get_kain_level_lore_offset(int level)
 int get_kain_level_hp_offset(int level)
 {
     return kain_levels_offset + (level*4*2) + 4;
+}
+
+FILE* log_file = NULL;
+
+// Initialize log file
+void init_logger(const char* filename) {
+    log_file = fopen(filename, "a");
+    if (!log_file) {
+        printf("Error opening log file %s\n", filename);
+    }
+}
+
+// Close log file
+void cleanup_logger() {
+    if (log_file) {
+        fclose(log_file);
+        log_file = NULL;
+    }
+}
+
+// Custom print function that logs to both screen and file
+void log_print(const char* format, ...) {
+    va_list args;
+
+    // Print to screen
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+
+    // Print to log file with timestamp
+    if (log_file) {
+        /*
+        // Get current time
+        time_t now = time(NULL);
+        struct tm* t = localtime(&now);
+        char time_str[20];
+        strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", t);
+
+        // Write timestamp
+        fprintf(log_file, "[%s] ", time_str);
+        */
+
+        // Write message
+        va_start(args, format);
+        vfprintf(log_file, format, args);
+        va_end(args);
+
+        fflush(log_file);
+    }
 }
 
 void clearScreen()
@@ -222,6 +272,8 @@ int dump_fromBigFile(const char* BigFile, long start_offset, const char* dumpfil
    fclose(fp);
    return 0;
 }
+
+#define printf log_print
 
 int main(int argc, char *argv[]) {
 
@@ -431,6 +483,19 @@ int main(int argc, char *argv[]) {
         my_exit();
     }
     */
+    append_directory(runPath, "BO2_tuner_log.txt", filename, sizeof(filename));
+    init_logger(filename);
+    // Get current time
+    time_t now = time(NULL);
+    struct tm* t = localtime(&now);
+    char time_str[20];
+    strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", t);
+
+    // Write timestamp
+    printf( "[%s]\n", time_str);
+
+    displayTitle();
+
 
     long replace_offset;
 
@@ -1926,6 +1991,7 @@ void my_exit()
     if (weaponCsvFileptr){ fclose(weaponCsvFileptr);}
     if (chestCsvFileptr){ fclose(chestCsvFileptr);}
     free_config(&config);
+    cleanup_logger();
     printf("\nPress a key and then Enter to continue...\n");
     getchar();  // Waits for a character + Enter
     exit(0);
