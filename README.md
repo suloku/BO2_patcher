@@ -1,6 +1,6 @@
 # Blood Omen 2 Retuner
 
-### Version 0.2 by suloku '25
+### Version 0.2.1 by suloku '25
 
 This is a patcher for the game Blood Omen 2.
 
@@ -21,6 +21,20 @@ Please open and read the comments inside each configuration file for more inform
 
 
 ## Changelog
+# 0.2.1
+General:
+- Weapon Chest multiplier bonus offset was wrong.
+- Fixed modifying the number of attacks when grabbing weaponless now works.
+- Added setting for total time Kain can hold an enemy.
+Retuned Mod:
+- Fury's cost increased to 210 (7 blocks) as it was too easy to charge.
+- Consistent femal NPC HP.
+
+Todo:
+- Add rage bar filling settings
+
+
+# 0.2
 - The patcher now works with configuration files instead of hard coded values.
 - The configuration file supports per sub-level configurations. This means you can, for example, have the Red chests in later leves have different amounts of lore. Same for NPCs.
 - A lot of new configuration options have been added: Dark Gifts settings, Kain's Thirst settings, Weapon Damage, Weapon duration...

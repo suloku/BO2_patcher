@@ -99,7 +99,8 @@ typedef struct {
     float telekinesis_regentime;
     float telekinesis_damage;
     //Weapons
-    int32_t hands_grabLoops;
+    float claws_holdtime;
+    int32_t claws_grabLoops;
     int32_t soulreaver_grabLoops;
     KainLevelData levels[KAIN_MAX_LEVELS]; // level_00 to level_25
     KainWeaponData weapons[KAIN_MAX_WEAPONS]; // hands, lsword, dagger, handax, crossbow, polearm, hsword, club, mace, soulreaver

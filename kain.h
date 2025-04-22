@@ -31,7 +31,9 @@ struct kainlevel {
 int wipe_chance_offset = 0x500;
 int KainHitReactControls_offset = 0x8e8;
 int time_on_ground_offset = 0x99c;
-int vampireWeaponDamageMultiplier_offset = 0x38;
+int vampireWeaponDamageMultiplier_offset = 0x44;
+int kain_claws_GrabTime_offset = 0xfc;
+int kain_claws_GrabLoopTimes_offset = 0xf8;
 
 //Thirst
 int kain_healthIncreaseRate_offset = 0x89c;		    // desc=Health_and_max_health_bar_grow_rates_after_suck_in_or_lore_level_upgrade default=50

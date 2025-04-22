@@ -642,7 +642,8 @@ void init_KAIN_config(KAIN_tunedata* KAIN)
     KAIN->telekinesis_regentime = -1;
     KAIN->telekinesis_damage = -1;
     //Weapons
-    KAIN->hands_grabLoops = -1;
+    KAIN->claws_holdtime = -1;
+    KAIN->claws_grabLoops = -1;
     KAIN->soulreaver_grabLoops = -1;
     for (int i = 0; i < KAIN_MAX_WEAPONS; i++)
     {
@@ -785,9 +786,13 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                     KAIN->telekinesis_damage = atof(kv->value);
                 }
                 //Weapons
+                else if (strcmp(kv->key, "hands_holdtime") == 0)
+                {
+                    KAIN->claws_holdtime = atof(kv->value);
+                }
                 else if (strcmp(kv->key, "hands_grabLoops") == 0)
                 {
-                    KAIN->hands_grabLoops = atoi(kv->value);
+                    KAIN->claws_grabLoops = atoi(kv->value);
                 }
                 else if (strcmp(kv->key, "soulreaver_grabLoops ") == 0)
                 {
