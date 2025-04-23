@@ -34,7 +34,7 @@ typedef struct {
 #define KAIN_MAX_LEVELS 26 // From level_00 to level_25
 #define MAX_TUNEDATA_FILENAME 20 // For weapon names like "soulreaver"
 #define KAIN_MAX_WEAPONS 10 // For weapon names like "soulreaver"
-#define MAX_LEVEL_ARRAY 1024
+#define MAX_LEVEL_ARRAY 1024 //This is enough even if all level names are present
 
 // Sub-structure for level data (LORE and HP pairs)
 typedef struct {
@@ -98,6 +98,12 @@ typedef struct {
     float superjump_regentime;
     float telekinesis_regentime;
     float telekinesis_damage;
+    //Rage Bar
+    float rage_max_points;
+    float rage_points_lost_per_second;
+    float rage_normal_block_points;
+    float rage_special_block_points;
+    float rage_dodge_points;
     //Weapons
     float claws_holdtime;
     int32_t claws_grabLoops;

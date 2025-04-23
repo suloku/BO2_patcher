@@ -1,6 +1,6 @@
 # Blood Omen 2 Retuner
 
-### Version 0.2.1 by suloku '25
+### Version 0.2.2 by suloku '25
 
 This is a patcher for the game Blood Omen 2.
 
@@ -17,10 +17,16 @@ Several configuration files are provided:
 - 04 No Lore - Faster Sucking.ini: same as "Faster Sucking", but additionally NPCs give no Lore. All lore is found in the Lore Chests, so sucking blood from NPCs is only needed to recover health. Max level has been adjusted for this change.
 - 05 BO2 Retuned Mod.ini: Includes the changes in "No Lore - Faster Sucking" and has several aditional rebalance changes. Refer to the Retuned Mod section for more information. 
 
-Please open and read the comments inside each configuration file for more information.
+Please open and read the comments inside each configuration file for more information. "01 Retail Configuration.ini" has descriptions for all configurable parameters, and it also has all retail game's values.
 
 
 ## Changelog
+
+# 0.2.2
+General:
+- Added Rage Bar settings (check "01 Retail Configuration.ini"): maximum Rage points, Rage Bar "drain" per second, Rage gained per block, Rage gained per special block, Rage gained per dodge.
+- Improvements in screen output format
+
 # 0.2.1
 General:
 - Weapon Chest multiplier bonus offset was wrong.

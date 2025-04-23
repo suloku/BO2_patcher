@@ -43,6 +43,13 @@ int kain_thirstMinPercent_offset = 0x8A8;			// desc=What_is_the_minimum_percenta
 int	kain_thirstDrainTime_offset = 0x8ac;			// desc=Number_of_seconds_between_thirst_drains default=30.0
 int	kain_thirstDrainAmount_offset = 0x8b0;			// desc=Number_of_hit_points_that_get_drained_per_thirst default=10.0
 
+//Rage Bar
+int kain_rage_max_points_offset = 0xb74;		        // desc=Max_number_of_points_we_can_accumulate default=100
+int kain_rage_points_lost_per_second_offset = 0xb78;    // desc=How_many_points_are_drained_per_second default=2
+int kain_rage_normal_block_points_offset = 0xb7c;		// desc=How_many_points_are_added_after_a_successful_block_of_a_normal_attack default=30
+int kain_rage_special_block_points_offset = 0xb80;		// desc=How_many_points_are_added_after_a_successful_block_of_a_special_attack default=60
+int kain_rage_dodge_points_offset = 0xb84;              // desc=How_many_points_are_added_after_a_successful_dodge default=10
+
 //Dark Gifts
 int kain_charm_regen_time_offset = 0x594;
 int kain_fury_cost_offset = 0x5A8;

@@ -630,6 +630,12 @@ void init_KAIN_config(KAIN_tunedata* KAIN)
     KAIN->thirst_min_percent = -1;
     KAIN->thirst_drain_time = -1;
     KAIN->thirst_drain_amount = -1;
+    //Rage Bar
+    KAIN->rage_max_points = -1;
+    KAIN->rage_points_lost_per_second = -1;
+    KAIN->rage_normal_block_points = -1;
+    KAIN->rage_special_block_points = -1;
+    KAIN->rage_dodge_points = -1;
     //Dark Gifts
     KAIN->charm_regentime = -1;
     KAIN->fury_cost = -1;
@@ -785,6 +791,28 @@ bool get_config_KAIN(Config* config, KAIN_tunedata* KAIN, const char* kainFile) 
                 {
                     KAIN->telekinesis_damage = atof(kv->value);
                 }
+                //Rage Bar
+                else if (strcmp(kv->key, "rage_max_points") == 0)
+                {
+                    KAIN->rage_max_points = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "rage_points_lost_per_second") == 0)
+                {
+                    KAIN->rage_points_lost_per_second = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "rage_normal_block_points") == 0)
+                {
+                    KAIN->rage_normal_block_points = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "rage_special_block_points") == 0)
+                {
+                    KAIN->rage_special_block_points = atof(kv->value);
+                }
+                else if (strcmp(kv->key, "rage_dodge_points") == 0)
+                {
+                    KAIN->rage_dodge_points = atof(kv->value);
+                }
+
                 //Weapons
                 else if (strcmp(kv->key, "hands_holdtime") == 0)
                 {

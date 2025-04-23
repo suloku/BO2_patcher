@@ -523,7 +523,7 @@ int main(int argc, char *argv[]) {
 
     if (dumpDataCSV && program_mode == DUMP_MODE)
     {
-        fprintf(KainCsvFileptr, "File;Wipe Chance;Lore Particles;Get Up Presses;Vampire Weapon Multiplier;Heath increase rate;Lore increase rate;Thirst drain rate;Thirst drain min %%;Thirst Drain interval;Thirst Drain amount;Charm regen time;Fury cost;Immolate cost;Immolate damage;Berskerk Cost;Stealth regen time;Super Jump regen time;Telekinesis regen time;Telekinesis damage;MaxLoreLevels;Lvl_00_Lore;Lvl_00_HP;Lvl_01_Lore;Lvl_01_HP;Lvl_02_Lore;Lvl_02_HP;Lvl_03_Lore;Lvl_03_HP;Lvl_04_Lore;Lvl_04_HP;Lvl_05_Lore;Lvl_05_HP;Lvl_06_Lore;Lvl_06_HP;Lvl_07_Lore;Lvl_07_HP;Lvl_08_Lore;Lvl_08_HP;Lvl_09_Lore;Lvl_09_HP;Lvl_10_Lore;Lvl_10_HP;Lvl_11_Lore;Lvl_11_HP;Lvl_12_Lore;Lvl_12_HP;Lvl_13_Lore;Lvl_13_HP;Lvl_14_Lore;Lvl_14_HP;Lvl_15_Lore;Lvl_15_HP;Lvl_16_Lore;Lvl_16_HP;Lvl_17_Lore;Lvl_17_HP;Lvl_18_Lore;Lvl_18_HP;Lvl_19_Lore;Lvl_19_HP;Lvl_20_Lore;Lvl_20_HP;Lvl_21_Lore;Lvl_21_HP;Lvl_22_Lore;Lvl_22_HP;Lvl_23_Lore;Lvl_23_HP;Lvl_24_Lore;Lvl_24_HP;Lvl_25_Lore;Lvl_25_HP;Claws 1st Attack;Claws 2nd Attack;Claws 3rd Attack;Claws Ground Attack;Claws Grab Loop;Claws Grab Final;Claws Grab Throw;Claws Fury Attack;Claws Jump Attack;Claws Berserk Attack;Claws Last Berserk Attack;Long Swords 1st Attack;Long Swords 2nd Attack;Long Swords 3rd Attack;Long Swords Ground Attack;Long Swords Grab Loop;Long Swords Grab Final;Long Swords Grab Throw;Long Swords Fury Attack;Long Swords Jump Attack;Long Swords Berserk Attack;Long Swords Last Berserk Attack;Daggers 1st Attack;Daggers 2nd Attack;Daggers 3rd Attack;Daggers Ground Attack;Daggers Grab Loop;Daggers Grab Final;Daggers Grab Throw;Daggers Fury Attack;Daggers Jump Attack;Daggers Berserk Attack;Daggers Last Berserk Attack;Short Axes 1st Attack;Short Axes 2nd Attack;Short Axes 3rd Attack;Short Axes Ground Attack;Short Axes Grab Loop;Short Axes Grab Final;Short Axes Grab Throw;Short Axes Fury Attack;Short Axes Jump Attack;Short Axes Berserk Attack;Short Axes Last Berserk Attack;Crossbow 1st Attack;Crossbow 2nd Attack;Crossbow 3rd Attack;Crossbow Ground Attack;Crossbow Grab Loop;Crossbow Grab Final;Crossbow Grab Throw;Crossbow Fury Attack;Crossbow Jump Attack;Crossbow Berserk Attack;Crossbow Last Berserk Attack;Double-Bladed Sword 1st Attack;Double-Bladed Sword 2nd Attack;Double-Bladed Sword 3rd Attack;Double-Bladed Sword Ground Attack;Double-Bladed Sword Grab Loop;Double-Bladed Sword Grab Final;Double-Bladed Sword Grab Throw;Double-Bladed Sword Fury Attack;Double-Bladed Sword Jump Attack;Double-Bladed Sword Berserk Attack;Double-Bladed Sword Last Berserk Attack;Broadsword/Long Axe 1st Attack;Broadsword/Long Axe 2nd Attack;Broadsword/Long Axe 3rd Attack;Broadsword/Long Axe Ground Attack;Broadsword/Long Axe Grab Loop;Broadsword/Long Axe Grab Final;Broadsword/Long Axe Grab Throw;Broadsword/Long Axe Fury Attack;Broadsword/Long Axe Jump Attack;Broadsword/Long Axe Berserk Attack;Broadsword/Long Axe Last Berserk Attack;Spiked Club/Scepter 1st Attack;Spiked Club/Scepter 2nd Attack;Spiked Club/Scepter 3rd Attack;Spiked Club/Scepter Ground Attack;Spiked Club/Scepter Grab Loop;Spiked Club/Scepter Grab Final;Spiked Club/Scepter Grab Throw;Spiked Club/Scepter Fury Attack;Spiked Club/Scepter Jump Attack;Spiked Club/Scepter Berserk Attack;Spiked Club/Scepter Last Berserk Attack;Mace 1st Attack;Mace 2nd Attack;Mace 3rd Attack;Mace Ground Attack;Mace Grab Loop;Mace Grab Final;Mace Grab Throw;Mace Fury Attack;Mace Jump Attack;Mace Berserk Attack;Mace Last Berserk Attack;Soul Reaver 1st Attack;Soul Reaver 2nd Attack;Soul Reaver 3rd Attack;Soul Reaver Ground Attack;Soul Reaver Grab Loop;Soul Reaver Grab Final;Soul Reaver Grab Throw;Soul Reaver Fury Attack;Soul Reaver Jump Attack;Soul Reaver Berserk Attack;Soul Reaver Last Berserk Attack;Max Grab Time;Claws Grab #;Soul Reaver Grab #;");
+        fprintf(KainCsvFileptr, "File;Wipe Chance;Lore Particles;Get Up Presses;Vampire Weapon Multiplier;Heath increase rate;Lore increase rate;Thirst drain rate;Thirst drain min %%;Thirst Drain interval;Thirst Drain amount;Charm regen time;Fury cost;Immolate cost;Immolate damage;Berskerk Cost;Stealth regen time;Super Jump regen time;Telekinesis regen time;Telekinesis damage;Max Points;Points loss per sec;Normal Block Points;Special Block Points;Dodge Points;MaxLoreLevels;Lvl_00_Lore;Lvl_00_HP;Lvl_01_Lore;Lvl_01_HP;Lvl_02_Lore;Lvl_02_HP;Lvl_03_Lore;Lvl_03_HP;Lvl_04_Lore;Lvl_04_HP;Lvl_05_Lore;Lvl_05_HP;Lvl_06_Lore;Lvl_06_HP;Lvl_07_Lore;Lvl_07_HP;Lvl_08_Lore;Lvl_08_HP;Lvl_09_Lore;Lvl_09_HP;Lvl_10_Lore;Lvl_10_HP;Lvl_11_Lore;Lvl_11_HP;Lvl_12_Lore;Lvl_12_HP;Lvl_13_Lore;Lvl_13_HP;Lvl_14_Lore;Lvl_14_HP;Lvl_15_Lore;Lvl_15_HP;Lvl_16_Lore;Lvl_16_HP;Lvl_17_Lore;Lvl_17_HP;Lvl_18_Lore;Lvl_18_HP;Lvl_19_Lore;Lvl_19_HP;Lvl_20_Lore;Lvl_20_HP;Lvl_21_Lore;Lvl_21_HP;Lvl_22_Lore;Lvl_22_HP;Lvl_23_Lore;Lvl_23_HP;Lvl_24_Lore;Lvl_24_HP;Lvl_25_Lore;Lvl_25_HP;Claws 1st Attack;Claws 2nd Attack;Claws 3rd Attack;Claws Ground Attack;Claws Grab Loop;Claws Grab Final;Claws Grab Throw;Claws Fury Attack;Claws Jump Attack;Claws Berserk Attack;Claws Last Berserk Attack;Long Swords 1st Attack;Long Swords 2nd Attack;Long Swords 3rd Attack;Long Swords Ground Attack;Long Swords Grab Loop;Long Swords Grab Final;Long Swords Grab Throw;Long Swords Fury Attack;Long Swords Jump Attack;Long Swords Berserk Attack;Long Swords Last Berserk Attack;Daggers 1st Attack;Daggers 2nd Attack;Daggers 3rd Attack;Daggers Ground Attack;Daggers Grab Loop;Daggers Grab Final;Daggers Grab Throw;Daggers Fury Attack;Daggers Jump Attack;Daggers Berserk Attack;Daggers Last Berserk Attack;Short Axes 1st Attack;Short Axes 2nd Attack;Short Axes 3rd Attack;Short Axes Ground Attack;Short Axes Grab Loop;Short Axes Grab Final;Short Axes Grab Throw;Short Axes Fury Attack;Short Axes Jump Attack;Short Axes Berserk Attack;Short Axes Last Berserk Attack;Crossbow 1st Attack;Crossbow 2nd Attack;Crossbow 3rd Attack;Crossbow Ground Attack;Crossbow Grab Loop;Crossbow Grab Final;Crossbow Grab Throw;Crossbow Fury Attack;Crossbow Jump Attack;Crossbow Berserk Attack;Crossbow Last Berserk Attack;Double-Bladed Sword 1st Attack;Double-Bladed Sword 2nd Attack;Double-Bladed Sword 3rd Attack;Double-Bladed Sword Ground Attack;Double-Bladed Sword Grab Loop;Double-Bladed Sword Grab Final;Double-Bladed Sword Grab Throw;Double-Bladed Sword Fury Attack;Double-Bladed Sword Jump Attack;Double-Bladed Sword Berserk Attack;Double-Bladed Sword Last Berserk Attack;Broadsword/Long Axe 1st Attack;Broadsword/Long Axe 2nd Attack;Broadsword/Long Axe 3rd Attack;Broadsword/Long Axe Ground Attack;Broadsword/Long Axe Grab Loop;Broadsword/Long Axe Grab Final;Broadsword/Long Axe Grab Throw;Broadsword/Long Axe Fury Attack;Broadsword/Long Axe Jump Attack;Broadsword/Long Axe Berserk Attack;Broadsword/Long Axe Last Berserk Attack;Spiked Club/Scepter 1st Attack;Spiked Club/Scepter 2nd Attack;Spiked Club/Scepter 3rd Attack;Spiked Club/Scepter Ground Attack;Spiked Club/Scepter Grab Loop;Spiked Club/Scepter Grab Final;Spiked Club/Scepter Grab Throw;Spiked Club/Scepter Fury Attack;Spiked Club/Scepter Jump Attack;Spiked Club/Scepter Berserk Attack;Spiked Club/Scepter Last Berserk Attack;Mace 1st Attack;Mace 2nd Attack;Mace 3rd Attack;Mace Ground Attack;Mace Grab Loop;Mace Grab Final;Mace Grab Throw;Mace Fury Attack;Mace Jump Attack;Mace Berserk Attack;Mace Last Berserk Attack;Soul Reaver 1st Attack;Soul Reaver 2nd Attack;Soul Reaver 3rd Attack;Soul Reaver Ground Attack;Soul Reaver Grab Loop;Soul Reaver Grab Final;Soul Reaver Grab Throw;Soul Reaver Fury Attack;Soul Reaver Jump Attack;Soul Reaver Berserk Attack;Soul Reaver Last Berserk Attack;Max Grab Time;Claws Grab #;Soul Reaver Grab #;");
     }
 
     for (i=0; i < kainbigfilecount; i++)
@@ -988,24 +988,132 @@ int main(int argc, char *argv[]) {
                 }
                 // Rage Bar Settings
                 printf("\t\tRage Bar:\n");
+
+                //Max Rage Points
+                replace_offset = current->data.fileOffset+kain_rage_max_points_offset;
+                if (tempKAINconfig.rage_max_points != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.rage_max_points, sizeof(tempKAINconfig.rage_max_points)) == 0)
+                    {
+                        printf("\t\t\tMax Rage Points: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.rage_max_points);
+                    } else
+                    {
+                        printf("\t\t\tMax Rage Points: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t\t  *Max Rage Points: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\t\tMax Rage Points:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+
+                //Rage points lost per second
+                replace_offset = current->data.fileOffset+kain_rage_points_lost_per_second_offset;
+                if (tempKAINconfig.rage_points_lost_per_second != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.rage_points_lost_per_second, sizeof(tempKAINconfig.rage_points_lost_per_second)) == 0)
+                    {
+                        printf("\t\t\tPoints lost per second: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.rage_points_lost_per_second);
+                    } else
+                    {
+                        printf("\t\t\tPoints lost per second: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t\t  *Points lost per second: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\t\tPoints lost per second:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+
+                //Rage points gained per normal block
+                replace_offset = current->data.fileOffset+kain_rage_normal_block_points_offset;
+                if (tempKAINconfig.rage_normal_block_points != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.rage_normal_block_points, sizeof(tempKAINconfig.rage_normal_block_points)) == 0)
+                    {
+                        printf("\t\t\tNormal block points: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.rage_normal_block_points);
+                    } else
+                    {
+                        printf("\t\t\tNormal block points: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t\t  *Normal block points: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\t\tNormal block points:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+
+                //Rage points gained per special block
+                replace_offset = current->data.fileOffset+kain_rage_special_block_points_offset;
+                if (tempKAINconfig.rage_special_block_points != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.rage_special_block_points, sizeof(tempKAINconfig.rage_special_block_points)) == 0)
+                    {
+                        printf("\t\t\tSpecial block points: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.rage_special_block_points);
+                    } else
+                    {
+                        printf("\t\t\tSpecial block points: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t\t  *Special block points: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\t\tSpecial block points:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+
+                //Rage points gained per dodge
+                replace_offset = current->data.fileOffset+kain_rage_dodge_points_offset;
+                if (tempKAINconfig.rage_dodge_points != -1 && program_mode == PATCH_MODE)
+                {
+                    if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.rage_dodge_points, sizeof(tempKAINconfig.rage_dodge_points)) == 0)
+                    {
+                        printf("\t\t\tDodge points: replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.rage_dodge_points);
+                    } else
+                    {
+                        printf("\t\t\tDodge block points: Failed to replace.\n");
+                    }
+                }
+                else
+                {
+                    float temp = 0;
+                    read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t\t  *Dodge block points: keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\t\t\tDodge block points:\t %06.2f\n", temp);
+                    if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
+                }
+
+                //Kain's Levels
+                printf("\t\tKain's Levels:\n");
                 //Change Max Lore Levels
                 replace_offset = current->data.fileOffset+numLoreLevels_offset;
                 if (tempKAINconfig.maxLoreLevels != -1 && program_mode == PATCH_MODE)
                 {
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.maxLoreLevels, sizeof(tempKAINconfig.maxLoreLevels)) == 0)
                     {
-                        printf("\t\tMax Lore Levels: replaced at offset 0x%lX to %03d\n", replace_offset, tempKAINconfig.maxLoreLevels);
+                        printf("\t\t\tMax Lore Levels: replaced at offset 0x%lX to %03d\n", replace_offset, tempKAINconfig.maxLoreLevels);
                     } else
                     {
-                        printf("\t\tMax Lore Levels: Failed to replace.\n");
+                        printf("\t\t\tMax Lore Levels: Failed to replace.\n");
                     }
                 }
                 else
                 {
                     int32_t temp = 0;
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    if (program_mode == PATCH_MODE) printf("\t\t  *Max Lore Levels: keeping value in file (no setting found) %03d\n", temp);
-                    else printf("\t\tMax Lore Levels:\t %03d\n", temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t\t  *Max Lore Levels: keeping value in file (no setting found) %03d\n", temp);
+                    else printf("\t\t\tMax Lore Levels: %03d\n", temp);
                     if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%d;", temp);
                 }
 
@@ -1018,18 +1126,18 @@ int main(int argc, char *argv[]) {
                     {
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.levels[j].lore, sizeof(tempKAINconfig.levels[j].lore)) == 0)
                         {
-                            printf("\t\t\tKain's Level %d Lore:\treplaced at offset 0x%lX to %06.2f\n", j, replace_offset, tempKAINconfig.levels[j].lore);
+                            printf("\t\t\t\tKain's Level %d Lore:\treplaced at offset 0x%lX to %06.2f\n", j, replace_offset, tempKAINconfig.levels[j].lore);
                         } else
                         {
-                            printf("\t\t\tKain's Level %d Lore:\tFailed to replace.\n", j);
+                            printf("\t\t\t\tKain's Level %d Lore:\tFailed to replace.\n", j);
                         }
                     }
                     else
                     {
                         float temp = 0;
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                        if (program_mode == PATCH_MODE) printf("\t\t\t  *Kain's Level %d Lore: keeping value in file (no setting found) %06.2f\n", j, temp);
-                        else printf("\t\t\tKain's Level %d Lore:\t %06.2f\n", j, temp);
+                        if (program_mode == PATCH_MODE) printf("\t\t\t\t  *Kain's Level %d Lore: keeping value in file (no setting found) %06.2f\n", j, temp);
+                        else printf("\t\t\t\tKain's Level %d Lore:\t %06.2f\n", j, temp);
                         if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                     }
 
@@ -1040,18 +1148,18 @@ int main(int argc, char *argv[]) {
                     {
                         if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.levels[j].hp, sizeof(tempKAINconfig.levels[j].hp)) == 0)
                         {
-                            printf("\t\t\tKain's Level %d HP:\treplaced at offset 0x%lX to %06.2f\n", j, replace_offset, tempKAINconfig.levels[j].hp);
+                            printf("\t\t\t\tKain's Level %d HP:\treplaced at offset 0x%lX to %06.2f\n", j, replace_offset, tempKAINconfig.levels[j].hp);
                         } else
                         {
-                            printf("\t\t\tKain's Level %d HP:\tFailed to replace.\n", j);
+                            printf("\t\t\t\tKain's Level %d HP:\tFailed to replace.\n", j);
                         }
                     }
                     else
                     {
                         float temp = 0;
                         read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                        if (program_mode == PATCH_MODE) printf("\t\t\t  *Kain's Level %d HP:\t keeping value in file (no setting found) %06.2f\n", j, temp);
-                        else printf("\t\t\tKain's Level %d HP:\t %06.2f\n", j, temp);
+                        if (program_mode == PATCH_MODE) printf("\t\t\t\t  *Kain's Level %d HP:\t keeping value in file (no setting found) %06.2f\n", j, temp);
+                        else printf("\t\t\t\tKain's Level %d HP:\t %06.2f\n", j, temp);
                         if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                     }
                 }
@@ -1371,18 +1479,18 @@ int main(int argc, char *argv[]) {
                 {
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.claws_holdtime, sizeof(tempKAINconfig.claws_holdtime)) == 0)
                     {
-                        printf("\n\t\tMax Grab Time:\t\t   replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.claws_holdtime);
+                        printf("\n\t\t    Max Grab Time:\t\t   replaced at offset 0x%lX to %06.2f\n", replace_offset, tempKAINconfig.claws_holdtime);
                     } else
                     {
-                        printf("\n\t\tMax Grab Time:\t\t   Failed to replace.\n");
+                        printf("\n\t\t    Max Grab Time:\t\t   Failed to replace.\n");
                     }
                 }
                 else
                 {
                     float temp = 0;
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    if (program_mode == PATCH_MODE) printf("\n\t\t  *Max Grab Time:\t   keeping value in file (no setting found) %06.2f\n", temp);
-                    else printf("\n\t\tMax Grab Time:\t\t   %06.2f\n", temp);
+                    if (program_mode == PATCH_MODE) printf("\n\t\t      *Max Grab Time:\t   keeping value in file (no setting found) %06.2f\n", temp);
+                    else printf("\n\t\t    Max Grab Time:\t\t   %06.2f\n", temp);
                     if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%f;", temp);
                 }
 
@@ -1392,18 +1500,18 @@ int main(int argc, char *argv[]) {
                 {
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.claws_grabLoops, sizeof(tempKAINconfig.claws_grabLoops)) == 0)
                     {
-                        printf("\t\tClaws Grab attack #:\t   replaced at offset 0x%lX to %02d\n", replace_offset, tempKAINconfig.claws_grabLoops);
+                        printf("\t\t    Claws Grab attack #:\t   replaced at offset 0x%lX to %02d\n", replace_offset, tempKAINconfig.claws_grabLoops);
                     } else
                     {
-                        printf("\t\tClaws Grab attack #:\t   Failed to replace.\n");
+                        printf("\t\t    Claws Grab attack #:\t   Failed to replace.\n");
                     }
                 }
                 else
                 {
                     int32_t temp = 0;
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    if (program_mode == PATCH_MODE) printf("\t\t  *Claws Grab attack #:\t   keeping value in file (no setting found) %02d\n", temp);
-                    else printf("\t\tClaws Grab attack #:\t   %03d\n", temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t      *Claws Grab attack #:\t   keeping value in file (no setting found) %02d\n", temp);
+                    else printf("\t\t    Claws Grab attack #:\t   %03d\n", temp);
                     if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%d;", temp);
                 }
 
@@ -1445,18 +1553,18 @@ int main(int argc, char *argv[]) {
                 {
                     if (replace_data_in_file(filename, replace_offset, (const unsigned char *)&tempKAINconfig.soulreaver_grabLoops, sizeof(tempKAINconfig.soulreaver_grabLoops)) == 0)
                     {
-                        printf("\t\tSoul Reaver Grab attack #: replaced at offset 0x%lX to %02d\n", replace_offset, tempKAINconfig.soulreaver_grabLoops);
+                        printf("\t\t    Soul Reaver Grab attack #: replaced at offset 0x%lX to %02d\n", replace_offset, tempKAINconfig.soulreaver_grabLoops);
                     } else
                     {
-                        printf("\t\tSoul Reaver Grab attack #: Failed to replace.\n");
+                        printf("\t\t    Soul Reaver Grab attack #: Failed to replace.\n");
                     }
                 }
                 else
                 {
                     int32_t temp = 0;
                     read_4_bytes_from_file(filename, replace_offset, (unsigned char *)&temp);
-                    if (program_mode == PATCH_MODE) printf("\t\t  *Soul Reaver Grab attack #: keeping value in file (no setting found) %02d\n", temp);
-                    else printf("\t\tSoul Reaver Grab attack #: %03d\n", temp);
+                    if (program_mode == PATCH_MODE) printf("\t\t      *Soul Reaver Grab attack #: keeping value in file (no setting found) %02d\n", temp);
+                    else printf("\t\t    Soul Reaver Grab attack #: %03d\n", temp);
                     if (dumpDataCSV && program_mode == DUMP_MODE) fprintf(KainCsvFileptr, "%d;", temp);
                 }
             }
