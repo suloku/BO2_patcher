@@ -305,6 +305,7 @@ const char *dropWeaponFilesToModNames[] = {
     "hax", //Long Axe
     "l_club", //Spiked Club
     "scepter" //Sarafan Scepter
+    "soulreaver" //Soul Reaver
 };
 size_t dropWeaponFilesToModNamesCount = sizeof(dropWeaponFilesToModNames) / sizeof(dropWeaponFilesToModNames[0]);
 
@@ -314,6 +315,7 @@ typedef struct WeaponTuneData {
     int32_t grabLoops;
 }WeaponTuneData;
 
+//Unused
 typedef enum {
     WEAPON_LSWORD,
     WEAPON_LSWORD2,
@@ -328,6 +330,7 @@ typedef enum {
     WEAPON_HAX,
     WEAPON_L_CLUB,
     WEAPON_SCEPTER,
+    WEAPON_SOULREAVER,
     WEAPON_COUNT // always useful to know how many entries
 } WeaponID;
 
@@ -345,4 +348,5 @@ WeaponTuneData DropWeaponData[] = {
     { .WeaponName = "hax", .HP = 20, .grabLoops = 3 },
     { .WeaponName = "l_club", .HP = 20, .grabLoops = 3 },
     { .WeaponName = "scepter", .HP = 20, .grabLoops = 3 }
+    { .WeaponName = "soulreaver", .HP = 0, .grabLoops = 3 }
 };

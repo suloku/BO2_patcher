@@ -1,0 +1,143 @@
+##################
+# Retail Version #
+##################
+
+This is a list of the kainX.big files that are used in the retail version of the game.
+The only difference between files is Kain's attire, and the fact that the kainf.big file used in bonus mode contains the Soul Reaver data.
+In a normal gameplay Soul Reaver data is present in the final boss level file (slarena.big).
+
+=======================================
+Retail version kainX.big files:
+
+- Armored Shoulder [ Chapters 01 - 03 ]: kain.big
+- Golden Pads      [ Chapters 04 - 06 ]: kainc.big
+- Red Hood         [ Chapters 07 - 09 ]: kaind.big
+- Spike Armor      [ Chapters 10 - 11 ]: kaine.big
+=======================================
+
+BONUS MODE:
+- Iron Armor      [ Chapters 01 - 11 ]: kainf.big
+
+Example:
+
+If you would want to double Kain's Claw damage parameters when he changes attire, for example when he gets the Spiky Armor (last two chapters of the game), an entry such as this could be made in a configuration file:
+
+[KAIN]
+kainFile = kaind
+hands_1stattack_damage = 20
+hands_2ndattack_damage = 20
+hands_3rdattack_damage = 60
+hands_ground_damage = 10
+hands_grab_loop_damage = 30
+hands_grab_final_damage = 60
+hands_grab_throw_damage = 100
+hands_fury_damage = 200
+hands_jump_damage = 100
+hands_berserk_damage = 0
+hands_lastberserk_damage = 360
+
+Any omitted parameter from this [KAIN] entry would be that of the [KAIN] entry with the "kainFile = default" (remember, the default entry must be the first one!). Parameteres not present in the current kainFile entry or the default kainFile entry will be ommited (a.k.a, the paramaters already in the file will be kept).
+
+##########################
+# Conceptual Edition Mod #
+##########################
+
+The Conceptual Edition Mod allows different attire configurations.
+
+Keep in mind the Conceptual Edition configuration and chapter progression when doing your configuration files if different Kain attires are to be configured.
+
+Note that while kain, kainc, kaind and kaine have the same attires in Retail and Conceptual Edition, the kainf file is the bonus mode Iron Armor for Retail version and Armored Shoulder for the CE version.
+
+Here's a list of all configurations and the files it uses:
+
+=======================================
+Conceptual:
+
+- Armored Shoulder [ Chapters 01 - 09 ]: kain.big
+- Spike Armor      [ Chapters 10 - 11 ]: kaine.big
+=======================================
+
+=======================================
+Classic:
+
+- Armored Shoulder [ Chapters 01 - 03 ]: kain.big
+- Golden Pads      [ Chapters 04 - 06 ]: kainc.big
+- Red Hood         [ Chapters 07 - 09 ]: kaind.big
+- Spike Armor      [ Chapters 10 - 11 ]: kaine.big
+=======================================
+
+=======================================
+Beguile:
+
+- Armored Shoulder [ Chapters 01 - 03 ]: kain.big
+- Golden Pads      [ Chapters 04 - 09 ]: kainv.big
+- Spike Armor      [ Chapters 10 - 11 ]: kaine.big
+=======================================
+
+=======================================
+Disguise:
+
+- Armored Shoulder [ Chapters 01 - 03 ]: kain.big
+- Red Hood         [ Chapters 04 - 09 ]: kaind.big
+- Spike Armor      [ Chapters 10 - 11 ]: kaine.big
+=======================================
+
+=======================================
+Chaos:
+
+- Armored Shoulder [ Chapters 01 - 03 ]: kain.big
+- Spike Armor      [ Chapters 04 - 11 ]: kaine.big
+=======================================
+
+=======================================
+Vintage:
+
+- Armored Shoulder [ Chapters 01 - 03 ]: kain.big
+- Iron Armor       [ Chapters 04 - 09 ]: kainb.big
+- Spike Armor      [ Chapters 10 - 11 ]: kaind.big
+=======================================
+
+=======================================
+Conquest:
+
+- Armored Shoulder [ Chapters 01 - 03 ]: kain.big
+- Spike Armor      [ Chapters 04 - 06 ]: kaine.big
+- Armored Shoulder [ Chapters 07 - 09 ]: kain.big
+- Spike Armor      [ Chapters 10 - 11 ]: kaine.big
+=======================================
+
+=======================================
+Resistance:
+
+- Armored Shoulder [ Chapters 01 - 03 ]: kain.big
+- Golden Pads      [ Chapters 04 - 06 ]: kainc.big
+- Armored Shoulder [ Chapters 07 - 09 ]: kain.big
+- Spike Armor      [ Chapterd 10 - 11 ]: kaine.big
+=======================================
+
+=======================================
+Origin:
+
+- Armored Shoulder [ Chapters 01 - 03 ]: kain.big
+- Iron Armor       [ Chapters 04 - 06 ]: kainb.big
+- Red Hood         [ Chapters 07 - 09 ]: kaind.big
+- Spike Armor      [ Chapters 10 - 11 ]: kaine.big
+=======================================
+
+=======================================
+Requital:
+
+- Armored Shoulder [ Chapters 01 - 06 ]: kain.big
+- Red Hood         [ Chapters 07 - 09 ]: kaind.big
+- Spike Armor      [ Chapters 10 - 11 ]: kaine.big
+=======================================
+
+=======================================
+CONCEPTUAL EDITION BONUS MODE
+
+- Armored Shoulder [ Chapters 01 - 11 ]: kainf.big
+- Golden Pads      [ Chapters 01 - 11 ]: kaing.big
+- Red Hood         [ Chapters 01 - 11 ]: kainh.big
+- Spike Armor      [ Chapters 01 - 11 ]: kaini.big
+- Iron Armor       [ Chapters 01 - 11 ]: kainb.big
+=======================================

@@ -25,7 +25,9 @@ Please open and read the comments inside each configuration file for more inform
 # 0.2.2
 General:
 - Added Rage Bar settings (check "01 Retail Configuration.ini"): maximum Rage points, Rage Bar "drain" per second, Rage gained per block, Rage gained per special block, Rage gained per dodge.
-- Improvements in screen output format
+- Added clarification comments about the Soul Reaver in "01 Retail Configuration.ini".
+- Improvements in screen output format.
+- Included "Kain_file_list.txt" with reference information of the different kainX.big files present in Retail and Conceptual Edition Mod versions of the game.
 
 # 0.2.1
 General:
